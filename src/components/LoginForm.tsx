@@ -1,11 +1,9 @@
 "use client"
 import {useState} from 'react'
 import Link from 'next/link'
-import {login} from '@/lib/auth'
+import {login, loginWithGoogle} from '@/lib/auth'
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-
-
 
 function LoginForm (){
    const router = useRouter();
@@ -16,6 +14,7 @@ function LoginForm (){
    const [showPassword, setShowPassword] = useState(false)
 
    const [isLoading, setIsLoading] = useState(false);
+   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
    const [error, setError] = useState<string | null>(null);
 
    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -39,7 +38,19 @@ function LoginForm (){
       if (result?.success) {
          router.push("/home");
       }
+   }
 
+   async function handleGoogleLogin() {
+      setIsGoogleLoading(true);
+      setError(null);
+
+      const result = await loginWithGoogle();
+
+      if (result?.error) {
+         setError(result.error);
+         setIsGoogleLoading(false);
+      }
+      // Se não houver erro, o usuário será redirecionado para o Google
    }
 
    return (
@@ -88,34 +99,34 @@ function LoginForm (){
             </fieldset>
 
             <fieldset className="border border-black rounded-lg px-3 pb-2 pt-0 w-full flex items-center ">
-            <legend className="text-xs text-black px-1">password</legend>
-            <input 
-               type={showPassword ? "text" : "password"}
-               name="password" 
-               id="password" 
-               required 
-               placeholder='********' 
-               minLength={8}
-               value={password}
-               onChange={(e) => setPassword(e.target.value)}
-               className="bg-transparent text-black focus:outline-none py-1 flex-1"
-            />
-            <button
-               type="button"
-               onClick={() => setShowPassword(!showPassword)}
-               className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer"
-            >
-               {!showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
+               <legend className="text-xs text-black px-1">password</legend>
+               <input 
+                  type={showPassword ? "text" : "password"}
+                  name="password" 
+                  id="password" 
+                  required 
+                  placeholder='********' 
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="bg-transparent text-black focus:outline-none py-1 flex-1"
+               />
+               <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer"
+               >
+                  {!showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+               </button>
             </fieldset>
             <div className='my-auto flex gap-3 w-full'>
-               <Link href={'/register'} className='flex-1 py-1 px-3 border border-[#2E2E2E] text-[#2E2E2E] rounded-md  '>SignUp</Link>
-               <button type="submit" className="bg-[#2E2E2E] border-[#2E2E2E] flex-3 py-1 px-3 border rounded-md text-[#F8F4EE] hover:bg-[#F8F4EE] hover:text-[#2E2E2E] cursor-pointer font-bold" onClick={() => console.log("BOTÃO CLICADO")}>
-                  {!isLoading ? (
-                     <>Login</>
-                  ) : (
-                     <>processing...</>
-                  )}
+               <Link href={'/register'} className='flex-1 py-1 px-3 border border-[#2E2E2E] text-[#2E2E2E] rounded-md text-center'>SignUp</Link>
+               <button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="bg-[#2E2E2E] border-[#2E2E2E] flex-3 py-1 px-3 border rounded-md text-[#F8F4EE] hover:bg-[#F8F4EE] hover:text-[#2E2E2E] cursor-pointer font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+               >
+                  {!isLoading ? "Login" : "processing..."}
                </button>
             </div>
          </form>
@@ -124,15 +135,18 @@ function LoginForm (){
             <span className="text-sm">or</span>
             <hr className="flex-1 border-t border-[#2E2E2E]" />
          </div>
-         <Link href={'/login'} className='w-full cursor-pointer border border-[#2E2E2E] rounded-md py-2 px-5 flex'>
+         <button 
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading}
+            className='w-full cursor-pointer border border-[#2E2E2E] rounded-md py-2 px-5 flex hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+         >
             <div className='flex gap-5 items-center'>
-               <img src="google.png" alt="" className='w-5 h-5 object-contain'/>
-               <p>SignIn with Google</p>
+               <img src="google.png" alt="Google" className='w-5 h-5 object-contain'/>
+               <p>{!isGoogleLoading ? "SignIn with Google" : "Connecting..."}</p>
             </div>
-         </Link> 
+         </button> 
       </div>
    )
 }
 
 export default LoginForm;
-

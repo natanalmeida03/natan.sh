@@ -1,5 +1,7 @@
 "use server"
 import { createClient } from "@/utils/supabase/server"; 
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 export async function login(formData: FormData) {
    const supabase = await createClient();
@@ -14,6 +16,33 @@ export async function login(formData: FormData) {
    }
 
    return { success: true }
+}
+
+export async function loginWithGoogle() {
+   const supabase = await createClient();
+   const headersList = await headers();
+   const origin = headersList.get("origin") || headersList.get("host");
+   
+   const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+         redirectTo: `${origin}/auth/callback`,
+         queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+         },
+      },
+   });
+
+   if (error) {
+      return { error: error.message };
+   }
+
+   if (data.url) {
+      redirect(data.url);
+   }
+
+   return { error: "Failed to get redirect URL" };
 }
 
 export async function signup(formData: FormData) {
