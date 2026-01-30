@@ -1,0 +1,257 @@
+"use client"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { updateProfile, updatePassword, deleteAccount } from "@/lib/profile";
+import { Trash2, Save, Eye, EyeOff } from "lucide-react";
+
+interface ProfileFormProps {
+   initialUsername?: string;
+}
+
+function ProfileForm({ initialUsername = "" }: ProfileFormProps) {
+   const router = useRouter();
+   
+   const [username, setUsername] = useState(initialUsername);
+   const [password, setPassword] = useState("");
+   const [confirmPassword, setConfirmPassword] = useState("");
+   const [showPassword, setShowPassword] = useState(false);
+   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+   
+   const [loading, setLoading] = useState(false);
+   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+   async function handleUpdateUsername(e: React.FormEvent) {
+      setLoading(true);
+      setMessage(null);
+
+      const formData = new FormData();
+      formData.append("username", username);
+
+      const result = await updateProfile(formData);
+
+      if (result.error) {
+         setMessage({ type: "error", text: result.error });
+      } else {
+         setMessage({ type: "success", text: "Username updated successfully!" });
+      }
+
+      setUsername("")
+      setLoading(false);
+   }
+
+   async function handleUpdatePassword(e: React.FormEvent) {
+      e.preventDefault();
+      setLoading(true);
+      setMessage(null);
+
+      if (password !== confirmPassword) {
+         setMessage({ type: "error", text: "Passwords don't match" });
+         setLoading(false);
+         return;
+      }
+
+      const formData = new FormData();
+      formData.append("password", password);
+      formData.append("confirm_password", confirmPassword);
+
+      const result = await updatePassword(formData);
+
+      if (result.error) {
+         setMessage({ type: "error", text: result.error });
+      } else {
+         setMessage({ type: "success", text: "Password updated successfully!" });
+         setPassword("");
+         setConfirmPassword("");
+      }
+
+      setLoading(false);
+   }
+
+   async function handleDeleteAccount() {
+      setLoading(true);
+      setMessage(null);
+
+      const result = await deleteAccount();
+
+      if (result.error) {
+         setMessage({ type: "error", text: result.error });
+         setLoading(false);
+      } else {
+         router.push("/");
+      }
+   }
+
+   return (
+      <div className="relative mt-12 sm:mt-16 w-full flex-1 flex flex-col">
+         <div className="pt-6 sm:pt-8 pb-6 sm:pb-8 px-4 sm:px-8 w-full flex-1 flex flex-col">
+            
+            <h2 className="text-xl sm:text-2xl font-bold text-[#2E2E2E] mb-6">
+               Edit Profile
+            </h2>
+
+            {/* Message */}
+            {message && (
+               <div className={`mb-5 p-3 rounded-lg flex items-center justify-between ${
+                  message.type == "success" 
+                     ? "border border-green-400 bg-green-50" 
+                     : "border border-red-400 bg-red-50"
+               }`}>
+                  <div className="flex items-center gap-2">
+                     <svg 
+                        className="w-5 h-5"
+                        color={message.type == "success" ? "green" : "red"}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                     >
+                        <path 
+                           strokeLinecap="round" 
+                           strokeLinejoin="round" 
+                           strokeWidth={2} 
+                           d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                        />
+                     </svg>
+                     <span className={`text-sm ${
+                        message.type == "success" 
+                           ? "text-green-700" 
+                           : "text-red-700"
+                     }`}>{message.text}</span>
+                  </div>
+                  <button 
+                     onClick={() => setMessage(null)}
+                     className={message.type == "success" 
+                        ? "text-green-500 hover:text-green-700 cursor-pointer" 
+                        : "text-red-500 hover:text-red-700 cursor-pointer"
+                     }
+                  >
+                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                     </svg>
+                  </button>
+               </div>
+            )}
+
+            {/* Username Form */}
+            <form onSubmit={handleUpdateUsername} className="mb-6">
+               <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0">
+                  <legend className="text-xs text-[#2E2E2E] px-1">username</legend>
+                  <input 
+                     type="text" 
+                     name="username" 
+                     id="username" 
+                     required 
+                     placeholder="new username"
+                     value={username}
+                     onChange={(e) => setUsername(e.target.value)}
+                     className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm"
+                  />
+               </fieldset>
+               <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-3 w-full max-w-44 px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-lg font-medium text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-2"
+               >
+                  {/* <Save size={16} /> */}
+                  Save
+               </button>
+            </form>
+
+            {/* Password Form */}
+            <form onSubmit={handleUpdatePassword} className="mb-6 flex-1">
+               <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0 mb-3">
+                  <legend className="text-xs text-[#2E2E2E] px-1">new password</legend>
+                  <div className="flex items-center">
+                     <input 
+                        type={showPassword ? "text" : "password"}
+                        name="password" 
+                        id="password" 
+                        required 
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm"
+                     />
+                     <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer"
+                     >
+                        {!showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                     </button>
+                  </div>
+               </fieldset>
+
+               <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0">
+                  <legend className="text-xs text-[#2E2E2E] px-1">confirm password</legend>
+                  <div className="flex items-center">
+                     <input 
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirm_password" 
+                        id="confirm_password" 
+                        required 
+                        placeholder="••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm"
+                     />
+                     <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer"
+                     >
+                        {!showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                     </button>
+                  </div>
+               </fieldset>
+
+               <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-3 w-full max-w-44 px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-lg font-medium text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-2"
+               >
+                  {/* <Save size={16} /> */}
+                  Update password
+               </button>
+            </form>
+
+            {/* Delete Account */}
+            <div className="mt-auto pt-4 border-t border-[#2E2E2E]/20">
+               {!showDeleteConfirm ? (
+                  <button
+                     onClick={() => setShowDeleteConfirm(true)}
+                     className="w-full px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium text-sm hover:bg-red-500 hover:text-white transition-colors cursor-pointer flex items-center justify-center gap-2"
+                  >
+                     <Trash2 size={16} />
+                     Delete account
+                  </button>
+               ) : (
+                  <div className="space-y-2">
+                     <p className="text-sm text-red-600 font-medium text-center">
+                        Are you sure? This action cannot be undone.
+                     </p>
+                     <div className="flex gap-2">
+                        <button
+                           onClick={() => setShowDeleteConfirm(false)}
+                           className="flex-1 px-4 py-2 border-2 border-[#2E2E2E] text-[#2E2E2E] rounded-lg font-medium text-sm hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors cursor-pointer"
+                        >
+                           Cancel
+                        </button>
+                        <button
+                           onClick={handleDeleteAccount}
+                           disabled={loading}
+                           className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium text-sm hover:bg-red-600 transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                           <Trash2 size={16} />
+                           Confirm
+                        </button>
+                     </div>
+                  </div>
+               )}
+            </div>
+         </div>
+      </div>
+   );
+}
+
+export default ProfileForm;
