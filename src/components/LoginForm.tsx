@@ -113,7 +113,7 @@ function LoginForm (){
                <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer flex-shrink-0 ml-2"
+                  className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer shrink-0 ml-2"
                >
                   {!showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                </button>
@@ -123,7 +123,7 @@ function LoginForm (){
                <button 
                   type="submit" 
                   disabled={isLoading}
-                  className="bg-[#2E2E2E] border-[#2E2E2E] flex-[2] sm:flex-[3] py-1.5 sm:py-1 px-2 sm:px-3 border rounded-md text-[#F8F4EE] hover:bg-[#F8F4EE] hover:text-[#2E2E2E] cursor-pointer font-bold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                  className="bg-[#2E2E2E] border-[#2E2E2E] flex-2 sm:flex-3 py-1.5 sm:py-1 px-2 sm:px-3 border rounded-md text-[#F8F4EE] hover:bg-[#F8F4EE] hover:text-[#2E2E2E] cursor-pointer font-bold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                >
                   {!isLoading ? "Login" : "processing..."}
                </button>

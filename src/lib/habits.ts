@@ -378,3 +378,97 @@ export async function isHabitLoggedToday(habitId: string) {
 
     return { logged: !!data };
 }
+
+// ─── Novas funções para o calendário interativo ─────────────────────────
+
+// Busca todos os logs de hábitos do usuário para uma data específica
+export async function getHabitLogsByDate(date: string) {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return { error: "User not authenticated" };
+    }
+
+    // Busca os IDs dos hábitos do usuário para filtrar os logs
+    const { data: userHabits, error: habitsError } = await supabase
+        .from("habits")
+        .select("id")
+        .eq("user_id", user.id);
+
+    if (habitsError) {
+        return { error: habitsError.message };
+    }
+
+    if (!userHabits || userHabits.length === 0) {
+        return { data: [] };
+    }
+
+    const habitIds = userHabits.map((h) => h.id);
+
+    const { data, error } = await supabase
+        .from("habit_logs")
+        .select("*, habits(id, title, icon, color)")
+        .in("habit_id", habitIds)
+        .eq("logged_date", date)
+        .order("logged_at", { ascending: true });
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    return { data: data || [] };
+}
+
+// Busca todas as datas do mês que possuem pelo menos um log de hábito
+export async function getHabitLogsForMonth(year: number, month: number) {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return { error: "User not authenticated" };
+    }
+
+    const from = `${year}-${String(month).padStart(2, "0")}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+    // Busca os IDs dos hábitos do usuário
+    const { data: userHabits, error: habitsError } = await supabase
+        .from("habits")
+        .select("id")
+        .eq("user_id", user.id);
+
+    if (habitsError) {
+        return { error: habitsError.message };
+    }
+
+    if (!userHabits || userHabits.length === 0) {
+        return { data: [] };
+    }
+
+    const habitIds = userHabits.map((h) => h.id);
+
+    const { data, error } = await supabase
+        .from("habit_logs")
+        .select("logged_date")
+        .in("habit_id", habitIds)
+        .gte("logged_date", from)
+        .lte("logged_date", to);
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    // Retorna datas únicas
+    const uniqueDates = [...new Set((data || []).map((l) => l.logged_date as string))];
+    return { data: uniqueDates };
+}

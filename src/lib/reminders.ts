@@ -266,3 +266,74 @@ export async function deleteReminder(reminderId: string) {
 
     return { success: true };
 }
+
+// ─── Novas funções para o calendário interativo ─────────────────────────
+
+// Busca todos os lembretes de uma data específica (dia inteiro)
+export async function getRemindersByDate(date: string) {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return { error: "User not authenticated" };
+    }
+
+    // Intervalo: início do dia até fim do dia
+    const from = `${date}T00:00:00.000Z`;
+    const to = `${date}T23:59:59.999Z`;
+
+    const { data, error } = await supabase
+        .from("reminders")
+        .select("*, categories(id, name, color, icon)")
+        .eq("user_id", user.id)
+        .gte("due_at", from)
+        .lte("due_at", to)
+        .order("due_at", { ascending: true });
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    return { data: data || [] };
+}
+
+// Busca todas as datas do mês que possuem pelo menos um lembrete
+export async function getRemindersForMonth(year: number, month: number) {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return { error: "User not authenticated" };
+    }
+
+    const from = `${year}-${String(month).padStart(2, "0")}-01T00:00:00.000Z`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}T23:59:59.999Z`;
+
+    const { data, error } = await supabase
+        .from("reminders")
+        .select("due_at")
+        .eq("user_id", user.id)
+        .gte("due_at", from)
+        .lte("due_at", to);
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    // Extrai datas únicas no formato "YYYY-MM-DD"
+    const uniqueDates = [
+        ...new Set(
+            (data || []).map((r) => (r.due_at as string).split("T")[0])
+        ),
+    ];
+    return { data: uniqueDates };
+}
