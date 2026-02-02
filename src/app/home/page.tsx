@@ -9,7 +9,6 @@ import HomeCalendar from "@/components/HomeCalendar";
 import { getDashboardStats } from "@/lib/stats";
 import { getHabits, logHabit, unlogHabit, isHabitLoggedToday, getHabitLogsByDate, getHabitLogsForMonth } from "@/lib/habits";
 import { getUpcomingReminders, getReminders, getRemindersByDate, getRemindersForMonth } from "@/lib/reminders";
-import { getTodayRoutines } from "@/lib/routines";
 import { getProfile } from "@/lib/profile";
 import { getDailyNoteByDate, getNotesForMonth } from "@/lib/daily-notes";
 import Header from "@/components/Header";
@@ -86,14 +85,12 @@ export default function HomePage() {
       habitsRes,
       remindersRes,
       overdueRes,
-      routinesRes,
     ] = await Promise.all([
       getProfile(),
       getDashboardStats(),
       getHabits({ active_only: true }),
       getUpcomingReminders(5),
       getReminders({ completed: false }),
-      getTodayRoutines(),
     ]);
 
     // Profile
@@ -147,11 +144,6 @@ export default function HomePage() {
         (r) => new Date(r.due_at) < now
       );
       setOverdueCount(overdue.length);
-    }
-
-    // Routines
-    if (routinesRes.data) {
-      setRoutines(routinesRes.data as Routine[]);
     }
 
     setLoading(false);
