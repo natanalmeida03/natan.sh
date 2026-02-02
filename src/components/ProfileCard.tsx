@@ -168,7 +168,6 @@ function ProfileCard() {
                   Logout
                </button>
                <button
-                  onClick={handleEditProfile}
                   className="flex-1 px-3 py-2 border-2 bg-[#2E2E2E] border-[#2E2E2E] text-[#F8F4EE] rounded-lg font-medium text-xs sm:text-sm hover:bg-[#F8F4EE] hover:text-[#2E2E2E] transition-colors cursor-pointer"
                >
                   Change theme
