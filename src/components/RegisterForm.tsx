@@ -1,7 +1,7 @@
 "use client"
 import {useState} from 'react'
 import Link from 'next/link'
-import {signup} from '@/lib/auth'
+import {loginWithGoogle, signup} from '@/lib/auth'
 import { useRouter } from "next/navigation";
 
 function RegisterForm (){
@@ -12,6 +12,7 @@ function RegisterForm (){
    const [password, setPassword] = useState("")
 
    const [isLoading, setIsLoading] = useState(false);
+   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
    const [error, setError] = useState<string | null>(null);
 
    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -38,13 +39,26 @@ function RegisterForm (){
       }
    }
 
+   async function handleGoogleLogin() {
+      setIsGoogleLoading(true);
+      setError(null);
+
+      const result = await loginWithGoogle();
+
+      if (result?.error) {
+         setError(result.error);
+         setIsGoogleLoading(false);
+      }
+      // Se não houver erro, o usuário será redirecionado para o Google
+   }
+
    return (
-      <div className=''>
+      <div className='w-full'>
          {error && (
-            <div className="mb-5 p-3 border border-red-400 bg-red-50 rounded-lg flex items-center justify-between">
+            <div className="mb-4 sm:mb-5 p-2.5 sm:p-3 border border-red-400 bg-red-50 rounded-lg flex items-center justify-between">
                <div className="flex items-center gap-2">
                   <svg 
-                     className="w-5 h-5 text-red-500" 
+                     className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 shrink-0" 
                      fill="none" 
                      stroke="currentColor" 
                      viewBox="0 0 24 24"
@@ -56,11 +70,11 @@ function RegisterForm (){
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
                      />
                   </svg>
-                  <span className="text-red-700 text-sm">{error}</span>
+                  <span className="text-red-700 text-xs sm:text-sm">{error}</span>
                </div>
                <button 
                   onClick={() => setError(null)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 shrink-0 ml-2"
                >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -68,7 +82,7 @@ function RegisterForm (){
                </button>
             </div>
          )}
-         <form onSubmit={handleSubmit} className='space-y-5'>
+         <form onSubmit={handleSubmit} className='space-y-4 sm:space-y-5'>
             <fieldset className="border border-black rounded-lg px-3 pb-2 pt-0">
                <legend className="text-xs text-black px-1">username</legend>
                <input 
@@ -79,7 +93,7 @@ function RegisterForm (){
                   placeholder='your username' 
                   value={username}
                   onChange={(e) => setUserName(e.target.value)}
-                  className="w-full bg-transparent text-black focus:outline-none py-1"
+                  className="w-full bg-transparent text-black focus:outline-none py-1 text-sm sm:text-base"
                />
             </fieldset>
 
@@ -93,7 +107,7 @@ function RegisterForm (){
                   placeholder='your@email.com'
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-transparent text-black focus:outline-none py-1"
+                  className="w-full bg-transparent text-black focus:outline-none py-1 text-sm sm:text-base"
                />
             </fieldset>
 
@@ -108,12 +122,12 @@ function RegisterForm (){
                minLength={8}
                value={password}
                onChange={(e) => setPassword(e.target.value)}
-               className="w-full bg-transparent text-black focus:outline-none py-1"
+               className="w-full bg-transparent text-black focus:outline-none py-1 text-sm sm:text-base"
             />
             </fieldset>
-            <div className='my-auto flex gap-3 w-full'>
-               <Link href={'/login'} className='flex-1 py-1 px-3 border border-[#2E2E2E] text-[#2E2E2E] rounded-md  '>SignIn</Link>
-               <button type="submit" className="bg-[#2E2E2E] border-[#2E2E2E] flex-3 py-1 px-3 border rounded-md text-[#F8F4EE] hover:bg-[#F8F4EE] hover:text-[#2E2E2E] cursor-pointer font-bold">
+            <div className='my-auto flex gap-2 sm:gap-3 w-full'>
+               <Link href={'/login'} className='flex-1 py-1.5 sm:py-1 px-2 sm:px-3 border border-[#2E2E2E] text-[#2E2E2E] rounded-md text-center text-sm sm:text-base'>SignIn</Link>
+               <button type="submit" className="bg-[#2E2E2E] border-[#2E2E2E] flex-2 sm:flex-3 py-1.5 sm:py-1 px-2 sm:px-3 border rounded-md text-[#F8F4EE] hover:bg-[#F8F4EE] hover:text-[#2E2E2E] cursor-pointer font-bold text-sm sm:text-base">
                   {!isLoading ? (
                      <>Register</>
                   ) : (
@@ -122,21 +136,24 @@ function RegisterForm (){
                </button>
             </div>
          </form>
-         <div className="flex items-center gap-4 py-6 text-[#2E2E2E]">
+         <div className="flex items-center gap-3 sm:gap-4 py-5 sm:py-6 text-[#2E2E2E]">
             <hr className="flex-1 border-t border-[#2E2E2E]" />
-            <span className="text-sm">or</span>
+            <span className="text-xs sm:text-sm">or</span>
             <hr className="flex-1 border-t border-[#2E2E2E]" />
          </div>
-         <Link href={'/login'} className='w-full cursor-pointer border border-[#2E2E2E] rounded-md py-2 px-5 flex'>
-            <div className='flex gap-5 items-center'>
-               <img src="google.png" alt="" className='w-5 h-5 object-contain'/>
-               <p>SignIn with Google</p>
+         <button 
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading}
+            className='w-full cursor-pointer border border-[#2E2E2E] rounded-md py-2 px-3 sm:px-5 flex hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+         >
+            <div className='flex gap-3 sm:gap-5 items-center'>
+               <img src="google.png" alt="Google" className='w-4 h-4 sm:w-5 sm:h-5 object-contain'/>
+               <p className='text-sm sm:text-base'>{!isGoogleLoading ? "SignIn with Google" : "Connecting..."}</p>
             </div>
-         </Link>   
+         </button>   
          
       </div>
    )
 }
 
 export default RegisterForm;
-

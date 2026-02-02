@@ -48,7 +48,7 @@ function AboutPage() {
             <div className="mt-8 bg-[#2E2E2E] rounded-lg p-6 sm:p-8 font-mono text-sm flex-1">
                
                <div className="flex flex-col lg:flex-row gap-8">
-                  <div className="text-xs sm:text-sm leading-tight whitespace-pre select-none" style={{ color: avatarColor }}>
+                  <div className="text-xs sm:text-sm leading-tight whitespace-pre select-none hidden md:block" style={{ color: avatarColor }}>
 {`
                               
         ################      

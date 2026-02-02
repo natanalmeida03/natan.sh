@@ -36,7 +36,7 @@ export async function proxy(request: NextRequest) {
    const { data: { user } } = await supabase.auth.getUser();
 
    // Rotas protegidas
-   const protectedRoutes = ["/home", "/profile"];
+   const protectedRoutes = ["/home", "/profile", "/reminders", "/habits"];
    const isProtectedRoute = protectedRoutes.some(route => 
       request.nextUrl.pathname.startsWith(route)
    );
@@ -63,6 +63,8 @@ export const config = {
    matcher: [
       // Rotas que o middleware deve processar
       "/home/:path*",
+      "/reminders/:path*",
+      "/habits/:path*",
       "/profile",
       "/login",
       "/register",

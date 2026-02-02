@@ -1,11 +1,15 @@
 "use client"
 import Link from "next/link";
-import { LogOut } from 'lucide-react'
+import { LogOut, ArrowLeft } from 'lucide-react'
 import { logout } from "@/lib/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
-function Header () {
+interface HeaderProps {
+   backRoute?: () => void;
+}
+
+function Header ( { backRoute = () => {} }: HeaderProps) {
    const router = useRouter();
    const pathname = usePathname();
    const [inputValue, setInputValue] = useState("");
@@ -27,18 +31,10 @@ function Header () {
    return (
       <div className="flex flex-col mb-4">
          <div className="flex gap-3 sm:gap-4 items-center justify-between">
-            <h1 className="text-[#2E2E2E] text-sm sm:text-base">
-               <b>{currentPage}</b>@ubuntu:~# 
-               <input 
-                  type="text" 
-                  name="secret" 
-                  id="secret" 
-                  className="pl-2 sm:pl-3 w-20 sm:w-28 outline-0 bg-transparent"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleInputKeyDown}
-               />
-            </h1>
+            <button onClick={backRoute} className="text-[#2E2E2E] text-sm sm:text-base flex gap-2 items-center cursor-pointer">
+               <ArrowLeft size={16} />
+               {" "} Back
+            </button>
 
             {/* Desktop Menu */}
             <div className="hidden sm:flex gap-4 md:gap-6 items-center">

@@ -50,16 +50,15 @@ function LoginForm (){
          setError(result.error);
          setIsGoogleLoading(false);
       }
-      // Se não houver erro, o usuário será redirecionado para o Google
    }
 
    return (
-      <div className=''>
+      <div className='w-full'>
          {error && (
-            <div className="mb-5 p-3 border border-red-400 bg-red-50 rounded-lg flex items-center justify-between">
+            <div className="mb-4 sm:mb-5 p-2.5 sm:p-3 border border-red-400 bg-red-50 rounded-lg flex items-center justify-between">
                <div className="flex items-center gap-2">
                   <svg 
-                     className="w-5 h-5 text-red-500" 
+                     className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 shrink-0" 
                      fill="none" 
                      stroke="currentColor" 
                      viewBox="0 0 24 24"
@@ -71,11 +70,11 @@ function LoginForm (){
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
                      />
                   </svg>
-                  <span className="text-red-700 text-sm">{error}</span>
+                  <span className="text-red-700 text-xs sm:text-sm">{error}</span>
                </div>
                <button 
                   onClick={() => setError(null)}
-                  className="text-red-500 hover:text-red-700 cursor-pointer"
+                  className="text-red-500 hover:text-red-700 cursor-pointer shrink-0 ml-2"
                >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -83,7 +82,7 @@ function LoginForm (){
                </button>
             </div>
          )}
-         <form onSubmit={handleSubmit} className='space-y-5'>
+         <form onSubmit={handleSubmit} className='space-y-4 sm:space-y-5'>
             <fieldset className="border border-black rounded-lg px-3 pb-2 pt-0">
                <legend className="text-xs text-black px-1">email</legend>
                <input 
@@ -94,7 +93,7 @@ function LoginForm (){
                   placeholder='your@email.com'
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-transparent text-black focus:outline-none py-1"
+                  className="w-full bg-transparent text-black focus:outline-none py-1 text-sm sm:text-base"
                />
             </fieldset>
 
@@ -109,40 +108,40 @@ function LoginForm (){
                   minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-transparent text-black focus:outline-none py-1 flex-1"
+                  className="bg-transparent text-black focus:outline-none py-1 flex-1 text-sm sm:text-base min-w-0"
                />
                <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer"
+                  className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer flex-shrink-0 ml-2"
                >
                   {!showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                </button>
             </fieldset>
-            <div className='my-auto flex gap-3 w-full'>
-               <Link href={'/register'} className='flex-1 py-1 px-3 border border-[#2E2E2E] text-[#2E2E2E] rounded-md text-center'>SignUp</Link>
+            <div className='my-auto flex gap-2 sm:gap-3 w-full'>
+               <Link href={'/register'} className='flex-1 py-1.5 sm:py-1 px-2 sm:px-3 border border-[#2E2E2E] text-[#2E2E2E] rounded-md text-center text-sm sm:text-base'>SignUp</Link>
                <button 
                   type="submit" 
                   disabled={isLoading}
-                  className="bg-[#2E2E2E] border-[#2E2E2E] flex-3 py-1 px-3 border rounded-md text-[#F8F4EE] hover:bg-[#F8F4EE] hover:text-[#2E2E2E] cursor-pointer font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#2E2E2E] border-[#2E2E2E] flex-[2] sm:flex-[3] py-1.5 sm:py-1 px-2 sm:px-3 border rounded-md text-[#F8F4EE] hover:bg-[#F8F4EE] hover:text-[#2E2E2E] cursor-pointer font-bold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                >
                   {!isLoading ? "Login" : "processing..."}
                </button>
             </div>
          </form>
-         <div className="flex items-center gap-4 py-6 text-[#2E2E2E]">
+         <div className="flex items-center gap-3 sm:gap-4 py-5 sm:py-6 text-[#2E2E2E]">
             <hr className="flex-1 border-t border-[#2E2E2E]" />
-            <span className="text-sm">or</span>
+            <span className="text-xs sm:text-sm">or</span>
             <hr className="flex-1 border-t border-[#2E2E2E]" />
          </div>
          <button 
             onClick={handleGoogleLogin}
             disabled={isGoogleLoading}
-            className='w-full cursor-pointer border border-[#2E2E2E] rounded-md py-2 px-5 flex hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            className='w-full cursor-pointer border border-[#2E2E2E] rounded-md py-2 px-3 sm:px-5 flex hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
          >
-            <div className='flex gap-5 items-center'>
-               <img src="google.png" alt="Google" className='w-5 h-5 object-contain'/>
-               <p>{!isGoogleLoading ? "SignIn with Google" : "Connecting..."}</p>
+            <div className='flex gap-3 sm:gap-5 items-center'>
+               <img src="google.png" alt="Google" className='w-4 h-4 sm:w-5 sm:h-5 object-contain'/>
+               <p className='text-sm sm:text-base'>{!isGoogleLoading ? "SignIn with Google" : "Connecting..."}</p>
             </div>
          </button> 
       </div>

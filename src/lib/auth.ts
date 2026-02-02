@@ -20,13 +20,13 @@ export async function login(formData: FormData) {
 
 export async function loginWithGoogle() {
    const supabase = await createClient();
-   const headersList = await headers();
-   const origin = headersList.get("origin") || headersList.get("host");
+   
+   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
    
    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-         redirectTo: `${origin}/auth/callback`,
+         redirectTo: `${siteUrl}/auth/callback`,
          queryParams: {
             access_type: "offline",
             prompt: "consent",

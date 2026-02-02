@@ -4,6 +4,7 @@ import ProfileCard from "@/components/ProfileCard";
 import ProfileForm from "@/components/ProfileForm";
 import { getProfile } from "@/lib/profile";
 import { useState, useEffect } from "react";
+
 function ProfilePage () {
   const [username, setUsername] = useState("");
 
@@ -18,10 +19,10 @@ function ProfilePage () {
   }, []);
 
   return (
-  <div className="bg-[#F8F4EE] h-dvh flex">
-    <main className="bg-[#F8F4EE] max-w-10/12 mx-auto w-full flex flex-col py-16">
+  <div className="bg-[#F8F4EE] min-h-dvh flex">
+    <main className="bg-[#F8F4EE] w-full max-w-[92%] sm:max-w-[90%] md:max-w-[85%] lg:max-w-5/6 mx-auto flex flex-col py-6 sm:py-10 md:py-16">
       <Header />
-      <div className="flex-1 flex flex-col sm:flex-row gap-6 pt-4">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 sm:gap-6 pt-4">
         <ProfileCard />
         <ProfileForm initialUsername={username}/>
       </div>
