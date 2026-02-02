@@ -5,8 +5,6 @@ import { Flame, Bell, Target, RotateCw } from "lucide-react";
 import DailyNote from "@/components/DailyNote";
 import QuickHabits from "@/components/QuickHabits";
 import UpcomingReminders from "@/components/UpcomingReminders";
-import TodayRoutines from "@/components/TodayRoutines";
-import GoalProgress from "@/components/GoalProgress";
 import HomeCalendar from "@/components/HomeCalendar";
 import { getDashboardStats } from "@/lib/stats";
 import { getHabits, logHabit, unlogHabit, isHabitLoggedToday, getHabitLogsByDate, getHabitLogsForMonth } from "@/lib/habits";
