@@ -35,7 +35,7 @@ export default function DailyNote() {
       load();
    }, []);
 
-   // Autosave com debounce de 1.5s
+   // Autosave 
    useEffect(() => {
       if (loading) return;
       if (!content && !mood) return;
