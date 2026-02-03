@@ -48,25 +48,27 @@ export default function Home() {
               onClick={() => setMenuOpen(false)}
               className="block px-3 py-3 hover:bg-[#404040] transition-colors "
             >
-              <span className="text-[#6B6B6B]">{">"}</span> --login
+              <span className="text-[#6B6B6B]">{">"}</span> login
             </Link>
             <Link
               href="/register"
               onClick={() => setMenuOpen(false)}
               className="block px-3 py-3 hover:bg-[#404040] transition-colors"
             >
-              <span className="text-[#6B6B6B]">{">"}</span> --register
+              <span className="text-[#6B6B6B]">{">"}</span> register
             </Link>
           </div>
         )}
 
         {/* Iframe Container */}
         <div className="mt-4 flex w-full flex-1 min-h-[70vh] sm:min-h-0 rounded overflow-hidden border border-[#D0C9C0]">
-          <iframe
-            src="https://im.natan.sh"
-            frameBorder="0"
-            className="grow rounded cursor-pointer"
-          />
+          <Link href="https://im.natan.sh" target="_blank" className="grow">
+            <iframe
+              src="https://im.natan.sh"
+              frameBorder="0"
+              className="grow rounded cursor-pointer"
+            />
+          </Link>
         </div>
 
         {/* Footer estilo terminal */}
