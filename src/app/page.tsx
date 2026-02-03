@@ -63,7 +63,7 @@ export default function Home() {
         {/* Iframe Container */}
         <div className="mt-4 flex w-full flex-1 min-h-[70vh] sm:min-h-0 rounded overflow-hidden border border-[#D0C9C0]">
           <iframe
-            src="https://natangts.dev"
+            src="https://im.natan.sh"
             frameBorder="0"
             className="grow rounded cursor-pointer"
           />

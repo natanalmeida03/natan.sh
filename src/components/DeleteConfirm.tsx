@@ -10,8 +10,8 @@ interface DeleteConfirmProps {
 }
 
 export default function DeleteConfirm({
-   title = "Excluir",
-   message = "Tem certeza? Essa ação não pode ser desfeita.",
+   title = "Delete",
+   message = "Are you sure? This action cannot be undone.",
    onConfirm,
    trigger,
 }: DeleteConfirmProps) {
