@@ -62,7 +62,7 @@ export default function Home() {
 
         {/* Iframe Container */}
         <div className="mt-4 flex w-full flex-1 min-h-[70vh] sm:min-h-0 rounded overflow-hidden border border-[#D0C9C0]">
-          <Link href="https://im.natan.sh" target="_blank" className="grow">
+          <Link href="https://im.natan.sh" target="_blank" className="grow flex">
             <iframe
               src="https://im.natan.sh"
               frameBorder="0"
