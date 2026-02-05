@@ -165,7 +165,7 @@ export default function HabitDetailPage() {
    if (loading) {
       return (
          <div className="relative mt-4 lg:mt-16 w-full flex-1 flex items-center justify-center">
-            <div className="w-6 h-6 border-2 border-[#2E2E2E]/20 border-t-[#2E2E2E] rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
          </div>
       );
    }
@@ -173,10 +173,10 @@ export default function HabitDetailPage() {
    if (!habit) {
       return (
          <div className="relative mt-4 lg:mt-16 w-full flex-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-[#2E2E2E]/50 mb-3">Habit not found</p>
+            <p className="text-sm text-foreground/50 mb-3">Habit not found</p>
             <button
                onClick={() => router.push("/habits")}
-               className="px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-md text-xs sm:text-sm cursor-pointer"
+               className="px-4 py-2 bg-foreground text-background rounded-md text-xs sm:text-sm cursor-pointer"
             >
                Back
             </button>
@@ -185,8 +185,8 @@ export default function HabitDetailPage() {
    }
 
    return (
-      <div className="bg-[#F8F4EE] min-h-dvh flex">
-         <div className="bg-[#F8F4EE] w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
+      <div className="bg-background min-h-dvh flex">
+         <div className="bg-background w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
             {editing ? (
                /* Edit mode */
                <div>
@@ -219,13 +219,13 @@ export default function HabitDetailPage() {
                <div className="flex flex-col gap-4 sm:gap-5">
                   {/* Description */}
                   {habit.description && (
-                     <p className="text-xs sm:text-sm text-[#2E2E2E]/70">{habit.description}</p>
+                     <p className="text-xs sm:text-sm text-foreground/70">{habit.description}</p>
                   )}
 
                   {/* Calendar + Stats side by side on lg, stacked on mobile */}
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
                      {/* Calendar - takes more space */}
-                     <div className="border border-[#2E2E2E]/15 rounded-md p-3 sm:p-4 lg:flex-1">
+                     <div className="border border-foreground/15 rounded-md p-3 sm:p-4 lg:flex-1">
                         <StreakCalendar
                            loggedDates={loggedDates}
                            month={calMonth}
@@ -238,32 +238,32 @@ export default function HabitDetailPage() {
 
                      {/* Stats cards - vertical stack beside calendar */}
                      <div className="flex flex-row lg:flex-col gap-2 sm:gap-3 lg:w-48">
-                        <div className="flex-1 border border-[#2E2E2E]/15 rounded-md px-3 py-4 text-center flex flex-col items-center justify-center">
+                        <div className="flex-1 border border-foreground/15 rounded-md px-3 py-4 text-center flex flex-col items-center justify-center">
                            <Flame className="mb-1.5 text-orange-500" size={20} />
-                           <p className="text-lg sm:text-xl font-bold text-[#2E2E2E]">
+                           <p className="text-lg sm:text-xl font-bold text-foreground">
                               {streak?.current_streak || 0}
                            </p>
-                           <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">
+                           <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">
                               current streak
                            </p>
                         </div>
-                        <div className="flex-1 border border-[#2E2E2E]/15 rounded-md px-3 py-4 text-center flex flex-col items-center justify-center">
+                        <div className="flex-1 border border-foreground/15 rounded-md px-3 py-4 text-center flex flex-col items-center justify-center">
                            <TrendingUp className="mb-1.5 text-blue-500" size={20} />
-                           <p className="text-lg sm:text-xl font-bold text-[#2E2E2E]">
+                           <p className="text-lg sm:text-xl font-bold text-foreground">
                               {streak?.best_streak || 0}
                            </p>
-                           <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">
+                           <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">
                               best streak
                            </p>
                         </div>
-                        <div className="flex-1 border border-[#2E2E2E]/15 rounded-md px-3 py-4 text-center flex flex-col items-center justify-center">
+                        <div className="flex-1 border border-foreground/15 rounded-md px-3 py-4 text-center flex flex-col items-center justify-center">
                            <Calendar className="mb-1.5 text-green-500" size={20} />
-                           <p className="text-lg sm:text-xl font-bold text-[#2E2E2E]">
+                           <p className="text-lg sm:text-xl font-bold text-foreground">
                               {weeklyStats.length > 0
                                  ? weeklyStats[0].times_completed
                                  : 0}
                            </p>
-                           <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">
+                           <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">
                               this week
                            </p>
                         </div>
@@ -272,8 +272,8 @@ export default function HabitDetailPage() {
 
                   {/* Weekly history */}
                   {weeklyStats.length > 1 && (
-                     <div className="border border-[#2E2E2E]/15 rounded-md p-3 sm:p-4">
-                        <h3 className="text-xs sm:text-sm font-semibold text-[#2E2E2E] mb-3">
+                     <div className="border border-foreground/15 rounded-md p-3 sm:p-4">
+                        <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-3">
                            Histórico semanal
                         </h3>
                         <div className="flex flex-col gap-2">
@@ -287,10 +287,10 @@ export default function HabitDetailPage() {
 
                               return (
                                  <div key={week.week_start} className="flex items-center gap-3">
-                                    <span className="text-[10px] sm:text-xs font-mono text-[#2E2E2E]/50 w-16 shrink-0">
+                                    <span className="text-[10px] sm:text-xs font-mono text-foreground/50 w-16 shrink-0">
                                        {label}
                                     </span>
-                                    <div className="flex-1 h-2 bg-[#2E2E2E]/5 rounded-full overflow-hidden">
+                                    <div className="flex-1 h-2 bg-foreground/5 rounded-full overflow-hidden">
                                        <div
                                           className="h-full rounded-full transition-all"
                                           style={{
@@ -299,7 +299,7 @@ export default function HabitDetailPage() {
                                           }}
                                        />
                                     </div>
-                                    <span className="text-[10px] sm:text-xs font-mono text-[#2E2E2E]/50 w-8 text-right">
+                                    <span className="text-[10px] sm:text-xs font-mono text-foreground/50 w-8 text-right">
                                        {week.times_completed}x
                                     </span>
                                  </div>
@@ -310,10 +310,10 @@ export default function HabitDetailPage() {
                   )}
 
                   {/* Action buttons — edit + delete together at the bottom */}
-                  <div className="flex items-center gap-4 pt-4 border-t border-[#2E2E2E]/10">
+                  <div className="flex items-center gap-4 pt-4 border-t border-foreground/10">
                      <button
                         onClick={() => setEditing(true)}
-                        className="flex items-center gap-2 px-4 py-2 border border-[#2E2E2E] rounded-md text-xs sm:text-sm text-[#2E2E2E] hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors cursor-pointer"
+                        className="flex items-center gap-2 px-4 py-2 border border-foreground rounded-md text-xs sm:text-sm text-foreground hover:bg-foreground hover:text-background transition-colors cursor-pointer"
                      >
                         Edit
                      </button>

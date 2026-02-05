@@ -148,40 +148,40 @@ export default function HabitForm({
          )}
 
          {/* Title */}
-         <fieldset className="border border-[#2E2E2E] rounded-md px-3 pb-2 pt-0">
-            <legend className="text-xs text-[#2E2E2E] px-1">Title *</legend>
+         <fieldset className="border border-foreground rounded-md px-3 pb-2 pt-0">
+            <legend className="text-xs text-foreground px-1">Title *</legend>
             <input
                type="text"
                required
                placeholder="ex: Drink water"
                value={form.title}
                onChange={(e) => updateField("title", e.target.value)}
-               className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm"
+               className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm"
             />
          </fieldset>
 
          {/* Description */}
-         <fieldset className="border border-[#2E2E2E] rounded-md px-3 pb-2 pt-0">
-            <legend className="text-xs text-[#2E2E2E] px-1">Description</legend>
+         <fieldset className="border border-foreground rounded-md px-3 pb-2 pt-0">
+            <legend className="text-xs text-foreground px-1">Description</legend>
             <textarea
                placeholder="optional"
                value={form.description}
                onChange={(e) => updateField("description", e.target.value)}
                rows={2}
-               className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm resize-none"
+               className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm resize-none"
             />
          </fieldset>
 
          {/* Frequency */}
          <div className="flex flex-col sm:flex-row gap-3">
-            <fieldset className="border border-[#2E2E2E] rounded-md px-3 pb-2 pt-0 flex-1">
-               <legend className="text-xs text-[#2E2E2E] px-1">Frequency *</legend>
+            <fieldset className="border border-foreground rounded-md px-3 pb-2 pt-0 flex-1">
+               <legend className="text-xs text-foreground px-1">Frequency *</legend>
                <select
                   value={form.frequency_type}
                   onChange={(e) =>
                      updateField("frequency_type", e.target.value as HabitFormData["frequency_type"])
                   }
-                  className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                  className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
                >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
@@ -190,8 +190,8 @@ export default function HabitForm({
             </fieldset>
 
             {form.frequency_type !== "daily" && (
-               <fieldset className="border border-[#2E2E2E] rounded-md px-3 pb-2 pt-0 w-full sm:w-32">
-                  <legend className="text-xs text-[#2E2E2E] px-1">
+               <fieldset className="border border-foreground rounded-md px-3 pb-2 pt-0 w-full sm:w-32">
+                  <legend className="text-xs text-foreground px-1">
                      times/{form.frequency_type === "weekly" ? "week" : "month"}
                   </legend>
                   <input
@@ -200,7 +200,7 @@ export default function HabitForm({
                      max={form.frequency_type === "weekly" ? 7 : 31}
                      value={form.frequency_target}
                      onChange={(e) => updateField("frequency_target", parseInt(e.target.value) || 1)}
-                     className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm"
+                     className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm"
                   />
                </fieldset>
             )}
@@ -208,12 +208,12 @@ export default function HabitForm({
 
          {/* Category */}
          {categories.length > 0 && (
-            <fieldset className="border border-[#2E2E2E] rounded-md px-3 pb-2 pt-0">
-               <legend className="text-xs text-[#2E2E2E] px-1">categoria</legend>
+            <fieldset className="border border-foreground rounded-md px-3 pb-2 pt-0">
+               <legend className="text-xs text-foreground px-1">category</legend>
                <select
                   value={form.category_id}
                   onChange={(e) => updateField("category_id", e.target.value)}
-                  className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                  className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
                >
                   <option value="">No category</option>
                   {categories.map((cat) => (
@@ -232,7 +232,7 @@ export default function HabitForm({
                onClick={() => setIconOpen((v) => !v)}
                className="w-full flex items-center justify-between px-3 py-2.5 cursor-pointer"
             >
-               <span className="text-xs text-[#2E2E2E] flex items-center gap-2">
+               <span className="text-xs text-foreground flex items-center gap-2">
                   Icon
                   {form.icon && (
                      <span className="text-base leading-none">{form.icon}</span>
@@ -240,7 +240,7 @@ export default function HabitForm({
                </span>
                <ChevronDown
                   size={16}
-                  className={`text-[#2E2E2E] transition-transform duration-200 ${
+                  className={`text-foreground transition-transform duration-200 ${
                      iconOpen ? "rotate-180" : ""
                   }`}
                />
@@ -252,21 +252,21 @@ export default function HabitForm({
                }`}
             >
                <div className="overflow-hidden">
-                  <div className="px-3 pb-3 flex flex-col gap-2.5">
+                  <div className="px-3 pb-3 flex flex-col gap-2.5 ">
                      {/* Search */}
-                     <div className="relative">
+                     <div className="relative ">
                         <input
                            type="text"
                            placeholder="Search... (ex: water, read, gym)"
                            value={iconSearch}
                            onChange={(e) => setIconSearch(e.target.value)}
-                           className="w-full bg-[#2E2E2E]/5 text-[#2E2E2E] rounded-md px-2.5 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-[#2E2E2E]/30 placeholder:text-[#2E2E2E]/40"
+                           className="w-full bg-foreground/5 text-foreground rounded-md px-2.5 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-foreground/30 placeholder:text-foreground/40"
                         />
                         {iconSearch && (
                            <button
                               type="button"
                               onClick={() => setIconSearch("")}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-[#2E2E2E]/40 hover:text-[#2E2E2E] cursor-pointer"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground cursor-pointer"
                            >
                               <X size={12} />
                            </button>
@@ -274,7 +274,7 @@ export default function HabitForm({
                      </div>
 
                      {/* Grid */}
-                     <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
+                     <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto no-scrollbar">
                         {filteredIcons.length > 0 ? (
                            filteredIcons.map((icon) => (
                               <button
@@ -285,15 +285,15 @@ export default function HabitForm({
                                  }
                                  className={`w-9 h-9 rounded-md flex items-center justify-center text-lg transition-all cursor-pointer ${
                                     form.icon === icon.emoji
-                                       ? "bg-[#2E2E2E] scale-110"
-                                       : "bg-[#2E2E2E]/5 hover:bg-[#2E2E2E]/10"
+                                       ? "bg-foreground scale-110"
+                                       : "bg-foreground/5 hover:bg-foreground/10"
                                  }`}
                               >
                                  {icon.emoji}
                               </button>
                            ))
                         ) : (
-                           <span className="text-xs text-[#2E2E2E]/50 font-mono py-2 px-1">
+                           <span className="text-xs text-foreground/50 font-mono py-2 px-1">
                               No icons found for &quot;{iconSearch}&quot;
                            </span>
                         )}
@@ -310,18 +310,18 @@ export default function HabitForm({
                onClick={() => setColorOpen((v) => !v)}
                className="w-full flex items-center justify-between px-3 py-2.5 cursor-pointer "
             >
-               <span className="text-xs text-[#2E2E2E] flex items-center gap-2">
+               <span className="text-xs text-foreground flex items-center gap-2">
                   Color
                   {form.color && (
                      <span
-                        className="w-3.5 h-3.5 rounded-full inline-block border border-[#2E2E2E]/20"
+                        className="w-3.5 h-3.5 rounded-full inline-block border border-foreground/20"
                         style={{ backgroundColor: form.color }}
                      />
                   )}
                </span>
                <ChevronDown
                   size={16}
-                  className={`text-[#2E2E2E] transition-transform duration-200 ${
+                  className={`text-foreground transition-transform duration-200 ${
                      colorOpen ? "rotate-180" : ""
                   }`}
                />
@@ -344,7 +344,7 @@ export default function HabitForm({
                               }
                               className={`w-8 h-8 rounded-full transition-all cursor-pointer ${
                                  form.color === color
-                                    ? "ring-2 ring-offset-2 ring-[#2E2E2E] scale-110"
+                                    ? "ring-2 ring-offset-2 ring-foreground scale-110"
                                     : "hover:scale-110"
                               }`}
                               style={{ backgroundColor: color }}
@@ -367,9 +367,9 @@ export default function HabitForm({
                            <button
                               type="button"
                               onClick={() => colorInputRef.current?.click()}
-                              className={`w-8 h-8 rounded-full transition-all cursor-pointer border-2 border-dashed border-[#2E2E2E]/30 hover:border-[#2E2E2E]/60 flex items-center justify-center ${
+                              className={`w-8 h-8 rounded-full transition-all cursor-pointer border-2 border-dashed border-foreground/30 hover:border-foreground/60 flex items-center justify-center ${
                                  form.color && !COLORS.includes(form.color)
-                                    ? "ring-2 ring-offset-2 ring-[#2E2E2E] scale-110"
+                                    ? "ring-2 ring-offset-2 ring-foreground scale-110"
                                     : "hover:scale-110"
                               }`}
                               style={
@@ -379,7 +379,7 @@ export default function HabitForm({
                               }
                            >
                               {(!form.color || COLORS.includes(form.color)) && (
-                                 <span className="text-[#2E2E2E]/40 text-xs font-bold">+</span>
+                                 <span className="text-foreground/40 text-xs font-bold">+</span>
                               )}
                            </button>
                         </div>
@@ -394,14 +394,14 @@ export default function HabitForm({
             <button
                type="button"
                onClick={onCancel}
-               className="flex-1 px-4 py-2 border-2 border-[#2E2E2E] text-[#2E2E2E] rounded-md font-medium text-xs sm:text-sm hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors cursor-pointer"
+               className="flex-1 px-4 py-2 border-2 border-foreground text-foreground rounded-md font-medium text-xs sm:text-sm hover:bg-foreground hover:text-background transition-colors cursor-pointer"
             >
                Cancel
             </button>
             <button
                type="submit"
                disabled={loading}
-               className="flex-2 px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-md font-medium text-xs sm:text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer disabled:opacity-50"
+               className="flex-2 px-4 py-2 bg-foreground text-background rounded-md font-medium text-xs sm:text-sm hover:bg-accent transition-colors cursor-pointer disabled:opacity-50"
             >
                {loading ? "Saving..." : submitLabel}
             </button>

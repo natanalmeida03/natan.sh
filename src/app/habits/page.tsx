@@ -111,32 +111,32 @@ export default function HabitsPage() {
     const bestStreak = Math.max(0, ...Object.values(streaks).map((s) => s.current_streak));
 
     return (
-        <div className="bg-[#F8F4EE] min-h-dvh flex">
-            <div className="bg-[#F8F4EE] w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
+        <div className="bg-background min-h-dvh flex">
+            <div className="bg-background w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
                 <Header />
                 {/* Stats bar */}
                 { (
                 <div className="flex gap-3 mb-4 sm:mb-5">
-                    <div className="flex-1 border border-[#2E2E2E]/15 rounded-md px-3 py-2 text-center">
-                        <p className="text-lg sm:text-xl font-bold text-[#2E2E2E]">
+                    <div className="flex-1 border border-foreground/15 rounded-md px-3 py-2 text-center">
+                        <p className="text-lg sm:text-xl font-bold text-foreground">
                             {doneToday?doneToday:"0"}/{totalActive?totalActive:"0"}
                         </p>
-                        <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">Today</p>
+                        <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">Today</p>
                     </div>
-                    <div className="flex-1 border border-[#2E2E2E]/15 rounded-md px-3 py-2 text-center">
+                    <div className="flex-1 border border-foreground/15 rounded-md px-3 py-2 text-center">
                         <p className="text-lg sm:text-xl font-bold text-orange-500 flex items-center justify-center gap-1">
                             <Flame size={18} />
                             {bestStreak?bestStreak:0}
                         </p>
-                        <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">
+                        <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">
                             Best streak
                         </p>
                     </div>
-                    <div className="flex-1 border border-[#2E2E2E]/15 rounded-md px-3 py-2 text-center">
-                        <p className="text-lg sm:text-xl font-bold text-[#2E2E2E]">
+                    <div className="flex-1 border border-foreground/15 rounded-md px-3 py-2 text-center">
+                        <p className="text-lg sm:text-xl font-bold text-foreground">
                             {totalActive?totalActive:"0"}
                         </p>
-                        <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">actives</p>
+                        <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">actives</p>
                     </div>
                 </div>
                 )}
@@ -160,7 +160,7 @@ export default function HabitsPage() {
                     </div>
                     <button
                         onClick={() => router.push("/habits/new")}
-                        className="px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-md font-medium text-xs sm:text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer flex items-center gap-1.5"
+                        className="px-4 py-2 bg-foreground text-background rounded-md font-medium text-xs sm:text-sm hover:bg-accent transition-colors cursor-pointer flex items-center gap-1.5"
                     >
                         Create new habit
                     </button>
@@ -169,19 +169,19 @@ export default function HabitsPage() {
                 {/* List */}
                 {loading ? (
                 <div className="flex-1 flex items-center justify-center">
-                    <div className="w-6 h-6 border-2 border-[#2E2E2E]/20 border-t-[#2E2E2E] rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
                 </div>
                 ) : habits.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
-                    <p className="text-sm sm:text-base text-[#2E2E2E]/70 mb-1">
+                    <p className="text-sm sm:text-base text-foreground/70 mb-1">
                         No {filter !== "all" ? ` ${filter === "active" ? "active" : "paused"}` : ""} habits
                     </p>
-                    <p className="text-xs text-[#2E2E2E]/40 mb-4">
+                    <p className="text-xs text-foreground/40 mb-4">
                         Start by creating your first habit.
                     </p>
                     <button
                         onClick={() => router.push("/habits/new")}
-                        className="px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-md font-medium text-xs sm:text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer flex items-center gap-1.5"
+                        className="px-4 py-2 bg-foreground text-background rounded-md font-medium text-xs sm:text-sm hover:bg-accent transition-colors cursor-pointer flex items-center gap-1.5"
                     >
                         {"> "}
                         Create habit

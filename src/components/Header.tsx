@@ -27,12 +27,12 @@ function Header () {
    return (
       <div className="flex flex-col mb-4">
          <div className="flex gap-3 sm:gap-4 items-center justify-between">
-            <h1 className="text-[#2E2E2E] text-sm sm:text-base">
-               <b>{currentPage}</b>@ubuntu:~# 
-               <input 
-                  type="text" 
-                  name="secret" 
-                  id="secret" 
+            <h1 className="text-foreground text-sm sm:text-base">
+               <b>{currentPage}</b>@ubuntu:~#
+               <input
+                  type="text"
+                  name="secret"
+                  id="secret"
                   className="pl-2 sm:pl-3 w-20 sm:w-28 outline-0 bg-transparent"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
@@ -47,14 +47,14 @@ function Header () {
                <Link href={'/reminders'}> reminders </Link>
                <Link href={'/profile'}> profile </Link>
                <p className="cursor-pointer" onClick={LogoutSubmit}>
-                  <LogOut color="red" size={20}/>
+                  <LogOut className="text-accent" size={20}/>
                </p>
             </div>
 
             {/* Mobile Menu Button */}
             <button
                onClick={() => setMenuOpen(!menuOpen)}
-               className="sm:hidden font-mono text-[#2E2E2E] py-1 px-2 cursor-pointer rounded text-sm hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors"
+               className="sm:hidden font-mono text-foreground py-1 px-2 cursor-pointer rounded text-sm hover:bg-foreground hover:text-background transition-colors"
             >
                {menuOpen ? "[x]" : "[=]"}
             </button>
@@ -62,43 +62,43 @@ function Header () {
 
          {/* Mobile Menu Dropdown */}
          {menuOpen && (
-            <div className="sm:hidden mt-3 font-mono text-sm rounded bg-[#F8F4EE] text-[#2E2E2E] overflow-hidden">
+            <div className="sm:hidden mt-3 font-mono text-sm rounded bg-background text-foreground overflow-hidden">
                <Link
                   href="/home"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-3 py-3 hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors"
+                  className="block px-3 py-3 hover:bg-foreground hover:text-background transition-colors"
                >
-                  <span className="text-[#6B6B6B]">{">"}</span> home
+                  <span className="text-muted">{">"}</span> home
                </Link>
                <Link
                   href="/habits"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-3 py-3 hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors"
+                  className="block px-3 py-3 hover:bg-foreground hover:text-background transition-colors"
                >
-                  <span className="text-[#6B6B6B]">{">"}</span> habits
+                  <span className="text-muted">{">"}</span> habits
                </Link>
                <Link
                   href="/reminders"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-3 py-3 hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors"
+                  className="block px-3 py-3 hover:bg-foreground hover:text-background transition-colors"
                >
-                  <span className="text-[#6B6B6B]">{">"}</span> reminders
+                  <span className="text-muted">{">"}</span> reminders
                </Link>
                <Link
                   href="/profile"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-3 py-3 hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors"
+                  className="block px-3 py-3 hover:bg-foreground hover:text-background transition-colors"
                >
-                  <span className="text-[#6B6B6B]">{">"}</span> profile
+                  <span className="text-muted">{">"}</span> profile
                </Link>
                <button
                   onClick={() => {
                      setMenuOpen(false);
                      LogoutSubmit();
                   }}
-                  className="w-full text-left px-3 py-3 hover:bg-red-500 hover:text-white transition-colors text-red-600 cursor-pointer"
+                  className="w-full text-left px-3 py-3 transition-colors text-accent cursor-pointer"
                >
-                  <span className="text-[#6B6B6B]">{">"}</span> logout
+                  <span className="text-muted">{">"}</span> logout
                </button>
             </div>
          )}

@@ -10,13 +10,13 @@ interface ProfileFormProps {
 
 function ProfileForm({ initialUsername = "" }: ProfileFormProps) {
    const router = useRouter();
-   
+
    const [username, setUsername] = useState(initialUsername);
    const [password, setPassword] = useState("");
    const [confirmPassword, setConfirmPassword] = useState("");
    const [showPassword, setShowPassword] = useState(false);
    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-   
+
    const [loading, setLoading] = useState(false);
    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -86,43 +86,43 @@ function ProfileForm({ initialUsername = "" }: ProfileFormProps) {
    return (
       <div className="relative mt-4 lg:mt-16 w-full flex-1 flex flex-col">
          <div className="pt-4 sm:pt-6 md:pt-8 pb-4 sm:pb-6 md:pb-8 px-0 sm:px-4 md:px-8 w-full flex-1 flex flex-col">
-            
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-[#2E2E2E] mb-4 sm:mb-6">
+
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-4 sm:mb-6">
                Edit Profile
             </h2>
 
             {/* Message */}
             {message && (
                <div className={`mb-4 sm:mb-5 p-2.5 sm:p-3 rounded-lg flex items-center justify-between ${
-                  message.type == "success" 
-                     ? "border border-green-400 bg-green-50" 
+                  message.type == "success"
+                     ? "border border-green-400 bg-green-50"
                      : "border border-red-400 bg-red-50"
                }`}>
                   <div className="flex items-center gap-2">
-                     <svg 
+                     <svg
                         className="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
                         color={message.type == "success" ? "green" : "red"}
-                        fill="none" 
-                        stroke="currentColor" 
+                        fill="none"
+                        stroke="currentColor"
                         viewBox="0 0 24 24"
                      >
-                        <path 
-                           strokeLinecap="round" 
-                           strokeLinejoin="round" 
-                           strokeWidth={2} 
-                           d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                        <path
+                           strokeLinecap="round"
+                           strokeLinejoin="round"
+                           strokeWidth={2}
+                           d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                      </svg>
                      <span className={`text-xs sm:text-sm ${
-                        message.type == "success" 
-                           ? "text-green-700" 
+                        message.type == "success"
+                           ? "text-green-700"
                            : "text-red-700"
                      }`}>{message.text}</span>
                   </div>
-                  <button 
+                  <button
                      onClick={() => setMessage(null)}
-                     className={`shrink-0 ml-2 ${message.type == "success" 
-                        ? "text-green-500 hover:text-green-700 cursor-pointer" 
+                     className={`shrink-0 ml-2 ${message.type == "success"
+                        ? "text-green-500 hover:text-green-700 cursor-pointer"
                         : "text-red-500 hover:text-red-700 cursor-pointer"
                      }`}
                   >
@@ -135,23 +135,23 @@ function ProfileForm({ initialUsername = "" }: ProfileFormProps) {
 
             {/* Username Form */}
             <form onSubmit={handleUpdateUsername} className="mb-4 sm:mb-6">
-               <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0">
-                  <legend className="text-xs text-[#2E2E2E] px-1">username</legend>
-                  <input 
-                     type="text" 
-                     name="username" 
-                     id="username" 
-                     required 
+               <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0">
+                  <legend className="text-xs text-foreground px-1">username</legend>
+                  <input
+                     type="text"
+                     name="username"
+                     id="username"
+                     required
                      placeholder="new username"
                      value={username}
                      onChange={(e) => setUsername(e.target.value)}
-                     className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm"
+                     className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm"
                   />
                </fieldset>
                <button
                   type="submit"
                   disabled={loading}
-                  className="mt-3 w-full sm:w-auto sm:min-w- md:max-w-44 px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-lg font-medium text-xs sm:text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="mt-3 w-full sm:w-auto sm:min-w- md:max-w-44 px-4 py-2 bg-foreground text-background rounded-lg font-medium text-xs sm:text-sm hover:bg-accent transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                >
                   Save
                </button>
@@ -159,46 +159,46 @@ function ProfileForm({ initialUsername = "" }: ProfileFormProps) {
 
             {/* Password Form */}
             <form onSubmit={handleUpdatePassword} className="mb-4 sm:mb-6 flex-1">
-               <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0 mb-3">
-                  <legend className="text-xs text-[#2E2E2E] px-1">new password</legend>
+               <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 mb-3">
+                  <legend className="text-xs text-foreground px-1">new password</legend>
                   <div className="flex items-center">
-                     <input 
+                     <input
                         type={showPassword ? "text" : "password"}
-                        name="password" 
-                        id="password" 
-                        required 
+                        name="password"
+                        id="password"
+                        required
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm min-w-0"
+                        className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm min-w-0"
                      />
                      <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer shrink-0 ml-2"
+                        className="text-foreground hover:text-muted transition-colors cursor-pointer shrink-0 ml-2"
                      >
                         {!showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                      </button>
                   </div>
                </fieldset>
 
-               <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0">
-                  <legend className="text-xs text-[#2E2E2E] px-1">confirm password</legend>
+               <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0">
+                  <legend className="text-xs text-foreground px-1">confirm password</legend>
                   <div className="flex items-center">
-                     <input 
+                     <input
                         type={showConfirmPassword ? "text" : "password"}
-                        name="confirm_password" 
-                        id="confirm_password" 
-                        required 
+                        name="confirm_password"
+                        id="confirm_password"
+                        required
                         placeholder="••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm min-w-0"
+                        className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm min-w-0"
                      />
                      <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="text-[#2E2E2E] hover:text-[#555] transition-colors cursor-pointer shrink-0 ml-2"
+                        className="text-foreground hover:text-muted transition-colors cursor-pointer shrink-0 ml-2"
                      >
                         {!showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                      </button>
@@ -208,14 +208,14 @@ function ProfileForm({ initialUsername = "" }: ProfileFormProps) {
                <button
                   type="submit"
                   disabled={loading}
-                  className="mt-3 w-full sm:w-auto sm:min-w- md:max-w-44 px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-lg font-medium text-xs sm:text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="mt-3 w-full sm:w-auto sm:min-w- md:max-w-44 px-4 py-2 bg-foreground text-background rounded-lg font-medium text-xs sm:text-sm hover:bg-accent transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                >
                   Update password
                </button>
             </form>
 
             {/* Delete Account */}
-            <div className="mt-auto pt-4 border-t border-[#2E2E2E]/20">
+            <div className="mt-auto pt-4 border-t border-foreground/20">
                {!showDeleteConfirm ? (
                   <button
                      onClick={() => setShowDeleteConfirm(true)}
@@ -232,7 +232,7 @@ function ProfileForm({ initialUsername = "" }: ProfileFormProps) {
                      <div className="flex flex-col xs:flex-row gap-2">
                         <button
                            onClick={() => setShowDeleteConfirm(false)}
-                           className="flex-1 px-4 py-2 border-2 border-[#2E2E2E] text-[#2E2E2E] rounded-lg font-medium text-xs sm:text-sm hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors cursor-pointer"
+                           className="flex-1 px-4 py-2 border-2 border-foreground text-foreground rounded-lg font-medium text-xs sm:text-sm hover:bg-foreground hover:text-background transition-colors cursor-pointer"
                         >
                            Cancel
                         </button>

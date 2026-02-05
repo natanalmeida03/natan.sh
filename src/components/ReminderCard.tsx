@@ -70,10 +70,10 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
          onClick={() => onEdit(reminder.id)}
          className={`relative border rounded-lg p-3 sm:p-4 transition-all cursor-pointer ${
             reminder.is_completed
-               ? "border-[#2E2E2E]/10 bg-[#2E2E2E]/2"
+               ? "border-foreground/10 bg-foreground/2"
                : overdue
                ? "border-red-300 bg-red-50/40"
-               : "border-[#2E2E2E]/20 bg-[#F8F4EE]"
+               : "border-foreground/20 bg-background"
          }`}
       >
          <div className="flex items-start gap-3">
@@ -83,10 +83,10 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                disabled={loading}
                className={`shrink-0 mt-0.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed ${
                   reminder.is_completed
-                     ? "bg-[#2E2E2E]/20 text-[#2E2E2E]/40"
+                     ? "bg-foreground/20 text-foreground/40"
                      : overdue
                      ? "border-2 border-red-400 text-transparent hover:bg-red-500 hover:text-white"
-                     : "border-2 border-[#2E2E2E]/30 text-transparent hover:border-green-400 hover:text-green-400"
+                     : "border-2 border-foreground/30 text-transparent hover:border-green-400 hover:text-green-400"
                }`}
             >
                <Check size={16} strokeWidth={3} />
@@ -97,8 +97,8 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                <h3
                   className={`text-sm sm:text-base font-semibold truncate ${
                      reminder.is_completed
-                        ? "line-through text-[#2E2E2E]/35"
-                        : "text-[#2E2E2E]"
+                        ? "line-through text-foreground/35"
+                        : "text-foreground"
                   }`}
                >
                   {reminder.title}
@@ -107,7 +107,7 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                {reminder.description && (
                   <p
                      className={`text-xs mt-0.5 truncate ${
-                        reminder.is_completed ? "text-[#2E2E2E]/25" : "text-[#2E2E2E]/50"
+                        reminder.is_completed ? "text-foreground/25" : "text-foreground/50"
                      }`}
                   >
                      {reminder.description}
@@ -119,10 +119,10 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                   <span
                      className={`text-[10px] sm:text-xs font-mono flex items-center gap-1 ${
                         reminder.is_completed
-                           ? "text-[#2E2E2E]/30"
+                           ? "text-foreground/30"
                            : overdue
                            ? "text-red-500"
-                           : "text-[#2E2E2E]/60"
+                           : "text-foreground/60"
                      }`}
                   >
                      {overdue ? <AlertTriangle size={11} /> : <Clock size={11} />}
@@ -144,8 +144,8 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                         style={{
                            backgroundColor: reminder.categories.color
                               ? `${reminder.categories.color}20`
-                              : "#2E2E2E10",
-                           color: reminder.categories.color || "#2E2E2E",
+                              : "color-mix(in srgb, var(--foreground1) 12%, transparent)",
+                           color: reminder.categories.color || "var(--foreground1)",
                         }}
                      >
                         {reminder.categories.name}
@@ -160,7 +160,7 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                   e.stopPropagation();
                   await onDelete(reminder.id);
                }}
-               className="shrink-0 p-1.5 text-[#2E2E2E]/40 hover:text-red-500 transition-colors cursor-pointer rounded-md hover:bg-red-50"
+               className="shrink-0 p-1.5 text-foreground/40 hover:text-red-500 transition-colors cursor-pointer rounded-md hover:bg-red-50"
                title="Excluir"
             >
                <Trash2 size={15} />

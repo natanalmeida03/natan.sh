@@ -141,32 +141,32 @@ export default function HomeCalendar({
   while (cells.length % 7 !== 0) cells.push(null);
 
   return (
-    <div className="border border-[#2E2E2E]/15 rounded-lg overflow-hidden">
+    <div className="border border-foreground/15 rounded-lg overflow-hidden">
       {/* Calendar Header */}
       <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-2">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <CalendarIcon size={14} className="text-[#2E2E2E]/40" />
-            <h3 className="text-xs sm:text-sm font-semibold text-[#2E2E2E]">
+            <CalendarIcon size={14} className="text-foreground/40" />
+            <h3 className="text-xs sm:text-sm font-semibold text-foreground">
               {monthName}
             </h3>
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={goToToday}
-              className="text-[10px] font-mono text-[#2E2E2E]/40 hover:text-[#2E2E2E] transition-colors cursor-pointer px-1.5 py-0.5 rounded hover:bg-[#2E2E2E]/5"
+              className="text-[10px] font-mono text-foreground/40 hover:text-foreground transition-colors cursor-pointer px-1.5 py-0.5 rounded hover:bg-foreground/5"
             >
               today
             </button>
             <button
               onClick={prevMonth}
-              className="p-1 text-[#2E2E2E]/40 hover:text-[#2E2E2E] transition-colors cursor-pointer rounded hover:bg-[#2E2E2E]/5"
+              className="p-1 text-foreground/40 hover:text-foreground transition-colors cursor-pointer rounded hover:bg-foreground/5"
             >
               <ChevronLeft size={14} />
             </button>
             <button
               onClick={nextMonth}
-              className="p-1 text-[#2E2E2E]/40 hover:text-[#2E2E2E] transition-colors cursor-pointer rounded hover:bg-[#2E2E2E]/5"
+              className="p-1 text-foreground/40 hover:text-foreground transition-colors cursor-pointer rounded hover:bg-foreground/5"
             >
               <ChevronRight size={14} />
             </button>
@@ -178,7 +178,7 @@ export default function HomeCalendar({
           {WEEKDAYS.map((d) => (
             <div
               key={d}
-              className="text-center text-[9px] sm:text-[10px] font-mono text-[#2E2E2E]/30 py-1"
+              className="text-center text-[9px] sm:text-[10px] font-mono text-foreground/30 py-1"
             >
               {d}
             </div>
@@ -205,10 +205,10 @@ export default function HomeCalendar({
                   aspect-square flex flex-col items-center justify-center rounded-lg
                   text-xs sm:text-sm transition-all cursor-pointer relative
                   ${isSelected
-                    ? "bg-[#2E2E2E] text-white font-semibold"
+                    ? "bg-foreground text-white font-semibold"
                     : isToday
-                      ? "bg-[#2E2E2E]/8 text-[#2E2E2E] font-semibold"
-                      : "text-[#2E2E2E]/70 hover:bg-[#2E2E2E]/5"
+                      ? "bg-foreground/8 text-foreground font-semibold"
+                      : "text-foreground/70 hover:bg-foreground/5"
                   }
                 `}
               >
@@ -232,14 +232,14 @@ export default function HomeCalendar({
         </div>
 
         {/* Dot legend */}
-        <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#2E2E2E]/5">
-          <span className="flex items-center gap-1 text-[9px] font-mono text-[#2E2E2E]/30">
+        <div className="flex items-center gap-3 mt-2 pt-2 border-t border-foreground/5">
+          <span className="flex items-center gap-1 text-[9px] font-mono text-foreground/30">
             <span className="w-1.25 h-1.25 rounded-full bg-blue-400" /> note
           </span>
-          <span className="flex items-center gap-1 text-[9px] font-mono text-[#2E2E2E]/30">
+          <span className="flex items-center gap-1 text-[9px] font-mono text-foreground/30">
             <span className="w-1.25 h-1.25 rounded-full bg-amber-400" /> reminder
           </span>
-          <span className="flex items-center gap-1 text-[9px] font-mono text-[#2E2E2E]/30">
+          <span className="flex items-center gap-1 text-[9px] font-mono text-foreground/30">
             <span className="w-1.25 h-1.25 rounded-full bg-green-400" /> habit
           </span>
         </div>
@@ -247,16 +247,16 @@ export default function HomeCalendar({
 
       {/* Day detail panel */}
       {panelOpen && (
-        <div className="border-t border-[#2E2E2E]/10 bg-[#2E2E2E]/2">
+        <div className="border-t border-foreground/10 bg-foreground/2">
           <div className="px-3 sm:px-4 py-3">
             {/* Panel header */}
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] sm:text-xs font-mono text-[#2E2E2E]/50 capitalize">
+              <p className="text-[10px] sm:text-xs font-mono text-foreground/50 capitalize">
                 {selectedDateFormatted}
               </p>
               <button
                 onClick={closePanel}
-                className="p-0.5 text-[#2E2E2E]/30 hover:text-[#2E2E2E] transition-colors cursor-pointer"
+                className="p-0.5 text-foreground/30 hover:text-foreground transition-colors cursor-pointer"
               >
                 <X size={14} />
               </button>
@@ -264,7 +264,7 @@ export default function HomeCalendar({
 
             {loadingDay ? (
               <div className="flex items-center justify-center py-6">
-                <div className="w-4 h-4 border-2 border-[#2E2E2E]/15 border-t-[#2E2E2E]/60 rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-foreground/15 border-t-foreground/60 rounded-full animate-spin" />
               </div>
             ) : dayData ? (
               <div className="flex flex-col gap-3">
@@ -272,7 +272,7 @@ export default function HomeCalendar({
                 <div>
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <FileText size={11} className="text-blue-400" />
-                    <span className="text-[10px] sm:text-xs font-semibold text-[#2E2E2E]/60">
+                    <span className="text-[10px] sm:text-xs font-semibold text-foreground/60">
                       Note
                     </span>
                     {dayData.note?.mood && (
@@ -280,11 +280,11 @@ export default function HomeCalendar({
                     )}
                   </div>
                   {dayData.note?.content ? (
-                    <p className="text-xs text-[#2E2E2E]/70 leading-relaxed font-mono bg-white/60 rounded-md px-2.5 py-2 border border-[#2E2E2E]/5">
+                    <p className="text-xs text-foreground/70 leading-relaxed font-mono bg-white/60 rounded-md px-2.5 py-2 border border-foreground/5">
                       {dayData.note.content}
                     </p>
                   ) : (
-                    <p className="text-[10px] sm:text-xs text-[#2E2E2E]/25 italic font-mono">
+                    <p className="text-[10px] sm:text-xs text-foreground/25 italic font-mono">
                       No note for this day
                     </p>
                   )}
@@ -294,11 +294,11 @@ export default function HomeCalendar({
                 <div>
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <Bell size={11} className="text-amber-400" />
-                    <span className="text-[10px] sm:text-xs font-semibold text-[#2E2E2E]/60">
+                    <span className="text-[10px] sm:text-xs font-semibold text-foreground/60">
                       Reminders
                     </span>
                     {dayData.reminders.length > 0 && (
-                      <span className="text-[9px] font-mono text-[#2E2E2E]/30 ml-auto">
+                      <span className="text-[9px] font-mono text-foreground/30 ml-auto">
                         {dayData.reminders.length}
                       </span>
                     )}
@@ -308,18 +308,18 @@ export default function HomeCalendar({
                       {dayData.reminders.map((r) => (
                         <div
                           key={r.id}
-                          className="flex items-center gap-2 px-2.5 py-1.5 bg-white/60 rounded-md border border-[#2E2E2E]/5"
+                          className="flex items-center gap-2 px-2.5 py-1.5 bg-white/60 rounded-md border border-foreground/5"
                         >
                           <span
                             className={`text-xs flex-1 truncate ${
                               r.is_completed
-                                ? "line-through text-[#2E2E2E]/30"
-                                : "text-[#2E2E2E]/70"
+                                ? "line-through text-foreground/30"
+                                : "text-foreground/70"
                             }`}
                           >
                             {r.title}
                           </span>
-                          <span className="text-[9px] font-mono text-[#2E2E2E]/30 shrink-0">
+                          <span className="text-[9px] font-mono text-foreground/30 shrink-0">
                             {new Date(r.due_at).toLocaleTimeString("en-us", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -331,8 +331,8 @@ export default function HomeCalendar({
                               style={{
                                 backgroundColor: r.categories.color
                                   ? `${r.categories.color}20`
-                                  : "#2E2E2E10",
-                                color: r.categories.color || "#2E2E2E",
+                                  : "color-mix(in srgb, var(--foreground1) 12%, transparent)",
+                                color: r.categories.color || "var(--foreground1)",
                               }}
                             >
                               {r.categories.name}
@@ -342,7 +342,7 @@ export default function HomeCalendar({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-[10px] sm:text-xs text-[#2E2E2E]/25 italic font-mono">
+                    <p className="text-[10px] sm:text-xs text-foreground/25 italic font-mono">
                       No reminders
                     </p>
                   )}
@@ -352,11 +352,11 @@ export default function HomeCalendar({
                 <div>
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <Flame size={11} className="text-green-400" />
-                    <span className="text-[10px] sm:text-xs font-semibold text-[#2E2E2E]/60">
+                    <span className="text-[10px] sm:text-xs font-semibold text-foreground/60">
                       Habits
                     </span>
                     {dayData.habits.length > 0 && (
-                      <span className="text-[9px] font-mono text-[#2E2E2E]/30 ml-auto">
+                      <span className="text-[9px] font-mono text-foreground/30 ml-auto">
                         {dayData.habits.filter((h) => h.logged).length}/{dayData.habits.length}
                       </span>
                     )}
@@ -369,7 +369,7 @@ export default function HomeCalendar({
                           className={`inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-1 rounded-md border ${
                             h.logged
                               ? "bg-green-50 border-green-200 text-green-600"
-                              : "bg-white/60 border-[#2E2E2E]/5 text-[#2E2E2E]/40"
+                              : "bg-white/60 border-foreground/5 text-foreground/40"
                           }`}
                         >
                           {h.icon && <span className="text-xs">{h.icon}</span>}
@@ -379,7 +379,7 @@ export default function HomeCalendar({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-[10px] sm:text-xs text-[#2E2E2E]/25 italic font-mono">
+                    <p className="text-[10px] sm:text-xs text-foreground/25 italic font-mono">
                       No habits tracked
                     </p>
                   )}

@@ -60,8 +60,8 @@ export default function NewReminderPage() {
    }
 
    return (
-      <div className="bg-[#F8F4EE] min-h-dvh flex">
-         <div className="bg-[#F8F4EE] w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
+      <div className="bg-background min-h-dvh flex">
+         <div className="bg-background w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
             <Header backRoute={() => router.back()}/>
             <p className="mb-3">Create a new reminder</p>
             <div className="flex items-center justify-center">

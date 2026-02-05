@@ -115,34 +115,34 @@ export default function RemindersPage() {
    const grouped = filter !== "completed" ? groupByDate(reminders) : { Concluídos: reminders };
 
    return (
-      <div className="bg-[#F8F4EE] min-h-dvh flex">
-         <div className="bg-[#F8F4EE] w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
+      <div className="bg-background min-h-dvh flex">
+         <div className="bg-background w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
             <Header />
 
             {/* Stats bar */}
             { (
                <div className="flex gap-3 mb-4 sm:mb-5">
-                  <div className="flex-1 border border-[#2E2E2E]/15 rounded-lg px-3 py-2 text-center">
-                     <p className="text-lg sm:text-xl font-bold text-[#2E2E2E] flex items-center justify-center gap-1">
-                        <Bell size={18} className="text-[#2E2E2E]/40" />
+                  <div className="flex-1 border border-foreground/15 rounded-lg px-3 py-2 text-center">
+                     <p className="text-lg sm:text-xl font-bold text-foreground flex items-center justify-center gap-1">
+                        <Bell size={18} className="text-foreground/40" />
                         {todayCount?todayCount:"0"}
                      </p>
-                     <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">today</p>
+                     <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">today</p>
                   </div>
-                  <div className="flex-1 border border-[#2E2E2E]/15 rounded-lg px-3 py-2 text-center">
+                  <div className="flex-1 border border-foreground/15 rounded-lg px-3 py-2 text-center">
                      <p className={`text-lg sm:text-xl font-bold flex items-center justify-center gap-1 ${
-                        overdueCount && overdueCount > 0 ? "text-red-500" : "text-[#2E2E2E]"
+                        overdueCount && overdueCount > 0 ? "text-red-500" : "text-foreground"
                      }`}>
                         {overdueCount?overdueCount:0 > 0 && <AlertTriangle size={18} />}
                         {overdueCount?overdueCount:"0"}
                      </p>
-                     <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">overdue</p>
+                     <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">overdue</p>
                   </div>
-                  <div className="flex-1 border border-[#2E2E2E]/15 rounded-lg px-3 py-2 text-center">
-                     <p className="text-lg sm:text-xl font-bold text-[#2E2E2E]">
+                  <div className="flex-1 border border-foreground/15 rounded-lg px-3 py-2 text-center">
+                     <p className="text-lg sm:text-xl font-bold text-foreground">
                         {pendingCount?pendingCount:"0"}
                      </p>
-                     <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono">pending</p>
+                     <p className="text-[10px] sm:text-xs text-foreground/50 font-mono">pending</p>
                   </div>
                </div>
             )}
@@ -170,7 +170,7 @@ export default function RemindersPage() {
                 </div>
                 <button
                     onClick={() => router.push("/reminders/new")}
-                    className="px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-md font-medium text-xs sm:text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="px-4 py-2 bg-foreground text-background rounded-md font-medium text-xs sm:text-sm hover:bg-accent transition-colors cursor-pointer flex items-center gap-1.5"
                     >
                     Create new reminder
                 </button>
@@ -179,18 +179,18 @@ export default function RemindersPage() {
             {/* List */}
             {loading ? (
                <div className="flex-1 flex items-center justify-center">
-                  <div className="w-6 h-6 border-2 border-[#2E2E2E]/20 border-t-[#2E2E2E] rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
                </div>
             ) : reminders.length === 0 ? (
                <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
-                  <p className="text-sm sm:text-base text-[#2E2E2E]/70 mb-1">
+                  <p className="text-sm sm:text-base text-foreground/70 mb-1">
                      {filter === "completed"
                         ? "No reminders completed"
                         : filter === "overdue"
                         ? "No late reminders!"
                         : "No pending reminders"}
                   </p>
-                  <p className="text-xs text-[#2E2E2E]/40 mb-4">
+                  <p className="text-xs text-foreground/40 mb-4">
                      {filter === "pending"
                         ? "Create your first reminder"
                         : filter === "overdue"
@@ -200,7 +200,7 @@ export default function RemindersPage() {
                   {filter === "pending" && (
                      <button
                         onClick={() => router.push("/reminders/new")}
-                        className="px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-lg font-medium text-xs sm:text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer flex items-center gap-1.5"
+                        className="px-4 py-2 bg-foreground text-background rounded-lg font-medium text-xs sm:text-sm hover:bg-accent transition-colors cursor-pointer flex items-center gap-1.5"
                      >
                         {'> '}
                         Create reminder
@@ -216,8 +216,8 @@ export default function RemindersPage() {
                               label === "Atrasados"
                                  ? "text-red-500"
                                  : label === "Today"
-                                 ? "text-[#2E2E2E]"
-                                 : "text-[#2E2E2E]/40"
+                                 ? "text-foreground"
+                                 : "text-foreground/40"
                            }`}
                         >
                            {label}

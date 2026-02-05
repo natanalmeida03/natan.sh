@@ -46,18 +46,18 @@ export default function QuickHabits({
    if (habits.length === 0) return null;
 
    return (
-      <div className="border border-[#2E2E2E]/15 rounded-lg p-3 sm:p-4">
+      <div className="border border-foreground/15 rounded-lg p-3 sm:p-4">
          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs sm:text-sm font-semibold text-[#2E2E2E]">
+            <h3 className="text-xs sm:text-sm font-semibold text-foreground">
                Habits for today
             </h3>
-            <span className="text-[10px] sm:text-xs font-mono text-[#2E2E2E]/40">
+            <span className="text-[10px] sm:text-xs font-mono text-foreground/40">
                {done}/{habits.length}
             </span>
          </div>
 
          {/* Progress bar */}
-         <div className="h-1.5 bg-[#2E2E2E]/5 rounded-full overflow-hidden mb-3">
+         <div className="h-1.5 bg-foreground/5 rounded-full overflow-hidden mb-3">
             <div
                className="h-full bg-green-500 rounded-full transition-all duration-500"
                style={{ width: `${habits.length > 0 ? (done / habits.length) * 100 : 0}%` }}
@@ -73,7 +73,7 @@ export default function QuickHabits({
                   <div
                      key={habit.id}
                      className={`flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-all ${
-                        logged ? "bg-green-50/60" : "hover:bg-[#2E2E2E]/2"
+                        logged ? "bg-green-50/60" : "hover:bg-foreground/2"
                      }`}
                   >
                      <button
@@ -82,7 +82,7 @@ export default function QuickHabits({
                         className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed ${
                            logged
                               ? "bg-green-500 text-white"
-                              : "border-[1.5px] border-[#2E2E2E]/25 text-transparent hover:border-green-400 hover:text-green-400"
+                              : "border-[1.5px] border-foreground/25 text-transparent hover:border-green-400 hover:text-green-400"
                         }`}
                      >
                         <Check size={12} strokeWidth={3} />
@@ -93,8 +93,8 @@ export default function QuickHabits({
                         <span
                            className={`text-xs sm:text-sm truncate ${
                               logged
-                                 ? "line-through text-[#2E2E2E]/35"
-                                 : "text-[#2E2E2E]"
+                                 ? "line-through text-foreground/35"
+                                 : "text-foreground"
                            }`}
                         >
                            {habit.title}

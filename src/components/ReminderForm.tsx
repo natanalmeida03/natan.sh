@@ -87,63 +87,63 @@ export default function ReminderForm({
          )}
 
          {/* Title */}
-         <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0">
-            <legend className="text-xs text-[#2E2E2E] px-1">Title *</legend>
+         <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0">
+            <legend className="text-xs text-foreground px-1">Title *</legend>
             <input
                type="text"
                required
                placeholder="ex: Meeting with team"
                value={form.title}
                onChange={(e) => updateField("title", e.target.value)}
-               className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm"
+               className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm"
             />
          </fieldset>
 
          {/* Description */}
-         <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0">
-            <legend className="text-xs text-[#2E2E2E] px-1">description</legend>
+         <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0">
+            <legend className="text-xs text-foreground px-1">description</legend>
             <textarea
                placeholder="optional"
                value={form.description}
                onChange={(e) => updateField("description", e.target.value)}
                rows={2}
-               className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm resize-none"
+               className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm resize-none"
             />
          </fieldset>
 
          {/* Date & Time */}
          <div className="flex flex-col sm:flex-row gap-3">
-            <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0 flex-1">
-               <legend className="text-xs text-[#2E2E2E] px-1">Date *</legend>
+            <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 flex-1">
+               <legend className="text-xs text-foreground px-1">Date *</legend>
                <input
                   type="date"
                   required
                   value={form.due_date}
                   onChange={(e) => updateField("due_date", e.target.value)}
-                  className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                  className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
                />
             </fieldset>
 
-            <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0 w-full sm:w-40">
-               <legend className="text-xs text-[#2E2E2E] px-1">Time *</legend>
+            <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 w-full sm:w-40">
+               <legend className="text-xs text-foreground px-1">Time *</legend>
                <input
                   type="time"
                   required
                   value={form.due_time}
                   onChange={(e) => updateField("due_time", e.target.value)}
-                  className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                  className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
                />
             </fieldset>
          </div>
 
          {/* Category */}
          {categories.length > 0 && (
-            <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0">
-               <legend className="text-xs text-[#2E2E2E] px-1">category</legend>
+            <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0">
+               <legend className="text-xs text-foreground px-1">category</legend>
                <select
                   value={form.category_id}
                   onChange={(e) => updateField("category_id", e.target.value)}
-                  className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                  className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
                >
                   <option value="">Sem categoria</option>
                   {categories.map((cat) => (
@@ -162,27 +162,27 @@ export default function ReminderForm({
          >
             <div
                className={`w-9 h-5 rounded-full transition-colors relative ${
-                  form.is_recurring ? "bg-[#2E2E2E]" : "bg-[#2E2E2E]/20"
+                  form.is_recurring ? "bg-foreground" : "bg-foreground/20"
                }`}
             >
                <div
-                  className={`absolute top-0.5 w-4 h-4 rounded-full bg-[#F8F4EE] transition-transform ${
+                  className={`absolute top-0.5 w-4 h-4 rounded-full bg-background transition-transform ${
                      form.is_recurring ? "translate-x-4" : "translate-x-0.5"
                   }`}
                />
             </div>
-            <span className="text-xs sm:text-sm text-[#2E2E2E]">Repeat reminder</span>
+            <span className="text-xs sm:text-sm text-foreground">Repeat reminder</span>
          </div>
 
          {/* Recurrence options */}
          {form.is_recurring && (
             <div className="flex flex-col sm:flex-row gap-3 pl-0 ">
-               <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0 flex-1">
-                  <legend className="text-xs text-[#2E2E2E] px-1">Recurrency</legend>
+               <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 flex-1">
+                  <legend className="text-xs text-foreground px-1">Recurrency</legend>
                   <select
                      value={form.recurrence_type}
                      onChange={(e) => updateField("recurrence_type", e.target.value)}
-                     className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                     className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
                   >
                      <option value="FREQ=DAILY;INTERVAL=1">Daily</option>
                      <option value="FREQ=WEEKLY;INTERVAL=1">Weekly</option>
@@ -191,13 +191,13 @@ export default function ReminderForm({
                   </select>
                </fieldset>
 
-               <fieldset className="border border-[#2E2E2E] rounded-lg px-3 pb-2 pt-0 flex-1">
-                  <legend className="text-xs text-[#2E2E2E] px-1">repeat until</legend>
+               <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 flex-1">
+                  <legend className="text-xs text-foreground px-1">repeat until</legend>
                   <input
                      type="date"
                      value={form.recurrence_end_date}
                      onChange={(e) => updateField("recurrence_end_date", e.target.value)}
-                     className="w-full bg-transparent text-[#2E2E2E] focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                     className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
                      placeholder="Sem limite"
                   />
                </fieldset>
@@ -209,14 +209,14 @@ export default function ReminderForm({
             <button
                type="button"
                onClick={onCancel}
-               className="flex-1 px-4 py-2 border-2 border-[#2E2E2E] text-[#2E2E2E] rounded-lg font-medium text-xs sm:text-sm hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors cursor-pointer"
+               className="flex-1 px-4 py-2 border-2 border-foreground text-foreground rounded-lg font-medium text-xs sm:text-sm hover:bg-foreground hover:text-background transition-colors cursor-pointer"
             >
                Cancel
             </button>
             <button
                type="submit"
                disabled={loading}
-               className="flex-2 px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-lg font-medium text-xs sm:text-sm hover:bg-[#1a1a1a] transition-colors cursor-pointer disabled:opacity-50"
+               className="flex-2 px-4 py-2 bg-foreground text-background rounded-lg font-medium text-xs sm:text-sm hover:bg-accent transition-colors cursor-pointer disabled:opacity-50"
             >
                {loading ? "Saving..." : "> Create Reminder"}
             </button>

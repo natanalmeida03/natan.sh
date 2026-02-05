@@ -239,29 +239,29 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="relative mt-4 lg:mt-16 w-full flex-1 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#2E2E2E]/20 border-t-[#2E2E2E] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="bg-[#F8F4EE] min-h-dvh flex">
-      <div className="bg-[#F8F4EE] w-full max-w-[95%] sm:max-w-10/12 xl:max-w-6xl mx-auto flex flex-col py-6 sm:py-16">
+    <div className="bg-background min-h-dvh flex">
+      <div className="bg-background w-full max-w-[95%] sm:max-w-10/12 xl:max-w-6xl mx-auto flex flex-col py-6 sm:py-16">
         <div className="mb-5 sm:mb-6">
           <Header />
-          <p className="text-gray-700 mb-4 mt-5">{today}</p>
+          <p className="text-accent mb-4 mt-5">{today}</p>
         </div>
 
         {/* Quick stats */}
         <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 sm:gap-3 mb-5 sm:mb-6">
           <button
             onClick={() => router.push("/habits")}
-            className="border border-[#2E2E2E]/15 rounded-lg px-3 py-2.5 text-center hover:border-[#2E2E2E]/30 transition-colors cursor-pointer"
+            className="border border-foreground/15 rounded-lg px-3 py-2.5 text-center hover:border-foreground/30 transition-colors cursor-pointer"
           >
-            <p className="text-lg sm:text-xl font-bold text-[#2E2E2E]">
+            <p className="text-lg sm:text-xl font-bold text-foreground">
               {stats.habits_completed_today}/{stats.active_habits}
             </p>
-            <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono flex items-center justify-center gap-1">
+            <p className="text-[10px] sm:text-xs text-foreground/50 font-mono flex items-center justify-center gap-1">
               <Flame size={11} className="text-orange-400" />
               habits
             </p>
@@ -269,18 +269,18 @@ export default function HomePage() {
 
           <button
             onClick={() => router.push("/reminders")}
-            className="border border-[#2E2E2E]/15 rounded-lg px-3 py-2.5 text-center hover:border-[#2E2E2E]/30 transition-colors cursor-pointer"
+            className="border border-foreground/15 rounded-lg px-3 py-2.5 text-center hover:border-foreground/30 transition-colors cursor-pointer"
           >
             <p
               className={`text-lg sm:text-xl font-bold ${
                 stats.pending_reminders > 0
-                  ? "text-[#2E2E2E]"
-                  : "text-[#2E2E2E]/30"
+                  ? "text-foreground"
+                  : "text-foreground/30"
               }`}
             >
               {stats.pending_reminders}
             </p>
-            <p className="text-[10px] sm:text-xs text-[#2E2E2E]/50 font-mono flex items-center justify-center gap-1">
+            <p className="text-[10px] sm:text-xs text-foreground/50 font-mono flex items-center justify-center gap-1">
               <Bell size={11} />
               reminders
             </p>

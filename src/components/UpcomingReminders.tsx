@@ -33,14 +33,14 @@ export default function UpcomingReminders({ reminders, overdueCount }: UpcomingR
    const router = useRouter();
 
    return (
-      <div className="border border-[#2E2E2E]/15 rounded-lg p-3 sm:p-4">
+      <div className="border border-foreground/15 rounded-lg p-3 sm:p-4">
          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs sm:text-sm font-semibold text-[#2E2E2E]">
+            <h3 className="text-xs sm:text-sm font-semibold text-foreground">
                Upcoming reminders
             </h3>
             <button
                onClick={() => router.push("/reminders")}
-               className="text-[10px] sm:text-xs text-[#2E2E2E]/40 hover:text-[#2E2E2E] transition-colors cursor-pointer flex items-center gap-0.5"
+               className="text-[10px] sm:text-xs text-foreground/40 hover:text-foreground transition-colors cursor-pointer flex items-center gap-0.5"
             >
                See all <ChevronRight size={12} />
             </button>
@@ -60,7 +60,7 @@ export default function UpcomingReminders({ reminders, overdueCount }: UpcomingR
          )}
 
          {reminders.length === 0 && overdueCount === 0 ? (
-            <p className="text-xs text-[#2E2E2E]/30 text-center py-3">
+            <p className="text-xs text-foreground/30 text-center py-3">
                No upcoming reminders
             </p>
          ) : (
@@ -69,12 +69,12 @@ export default function UpcomingReminders({ reminders, overdueCount }: UpcomingR
                   <button
                      key={r.id}
                      onClick={() => router.push(`/reminders/${r.id}`)}
-                     className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-[#2E2E2E]/3 transition-colors cursor-pointer text-left w-full"
+                     className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-foreground/3 transition-colors cursor-pointer text-left w-full"
                   >
-                     <Clock size={13} className="text-[#2E2E2E]/30 shrink-0" />
+                     <Clock size={13} className="text-foreground/30 shrink-0" />
                      <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm text-[#2E2E2E] truncate">{r.title}</p>
-                        <p className="text-[10px] font-mono text-[#2E2E2E]/40">
+                        <p className="text-xs sm:text-sm text-foreground truncate">{r.title}</p>
+                        <p className="text-[10px] font-mono text-foreground/40">
                            {formatRelative(r.due_at)}
                         </p>
                      </div>
@@ -82,8 +82,8 @@ export default function UpcomingReminders({ reminders, overdueCount }: UpcomingR
                         <span
                            className="text-[9px] px-1.5 py-0.5 rounded shrink-0"
                            style={{
-                              backgroundColor: r.categories.color ? `${r.categories.color}20` : "#2E2E2E10",
-                              color: r.categories.color || "#2E2E2E",
+                              backgroundColor: r.categories.color ? `${r.categories.color}20` : "color-mix(in srgb, var(--foreground1) 12%, transparent)",
+                              color: r.categories.color || "var(--foreground1)",
                            }}
                         >
                            {r.categories.name}

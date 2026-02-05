@@ -129,7 +129,7 @@ export default function ReminderDetailPage() {
    if (loading) {
       return (
          <div className="relative mt-4 lg:mt-16 w-full flex-1 flex items-center justify-center">
-            <div className="w-6 h-6 border-2 border-[#2E2E2E]/20 border-t-[#2E2E2E] rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
          </div>
       );
    }
@@ -137,10 +137,10 @@ export default function ReminderDetailPage() {
    if (!reminder) {
       return (
          <div className="relative mt-4 lg:mt-16 w-full flex-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-[#2E2E2E]/50 mb-3">Lembrete não encontrado</p>
+            <p className="text-sm text-foreground/50 mb-3">Lembrete não encontrado</p>
             <button
                onClick={() => router.push("/reminders")}
-               className="px-4 py-2 bg-[#2E2E2E] text-[#F8F4EE] rounded-lg text-xs sm:text-sm cursor-pointer"
+               className="px-4 py-2 bg-foreground text-background rounded-lg text-xs sm:text-sm cursor-pointer"
             >
                Voltar
             </button>
@@ -167,8 +167,8 @@ export default function ReminderDetailPage() {
    };
 
    return (
-      <div className="bg-[#F8F4EE] min-h-dvh flex">
-         <div className="bg-[#F8F4EE] w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
+      <div className="bg-background min-h-dvh flex">
+         <div className="bg-background w-full max-w-[95%] sm:max-w-10/12 mx-auto flex flex-col py-6 sm:py-16">
 
             {editing ? (
                <div>
@@ -217,20 +217,20 @@ export default function ReminderDetailPage() {
                      ) : null}
 
                      {/* Details card */}
-                     <div className="border border-[#2E2E2E]/15 rounded-lg p-4 flex flex-col gap-3">
+                     <div className="border border-foreground/15 rounded-lg p-4 flex flex-col gap-3">
                         {/* Description */}
                         {reminder.description && (
-                           <p className="text-xs sm:text-sm text-[#2E2E2E]/70">
+                           <p className="text-xs sm:text-sm text-foreground/70">
                               {reminder.description}
                            </p>
                         )}
 
                         {/* Due date */}
                         <div className="flex items-center gap-2">
-                           <Clock size={15} className="text-[#2E2E2E]/40 shrink-0" />
+                           <Clock size={15} className="text-foreground/40 shrink-0" />
                            <span
                               className={`text-xs sm:text-sm font-mono ${
-                                 overdue ? "text-red-500" : "text-[#2E2E2E]/70"
+                                 overdue ? "text-red-500" : "text-foreground/70"
                               }`}
                            >
                               {dueDate.toLocaleDateString("en-us", {
@@ -254,7 +254,7 @@ export default function ReminderDetailPage() {
                               <span className="text-xs sm:text-sm text-blue-600 font-mono">
                                  {recurrenceLabel}
                                  {reminder.recurrence_end_at && (
-                                    <span className="text-[#2E2E2E]/40">
+                                    <span className="text-foreground/40">
                                        {" "}até{" "}
                                        {new Date(reminder.recurrence_end_at).toLocaleDateString("en-us", {
                                           day: "2-digit",
@@ -270,7 +270,7 @@ export default function ReminderDetailPage() {
                         {/* Category */}
                         {reminder.categories && (
                            <div className="flex items-center gap-2">
-                              <Tag size={15} className="text-[#2E2E2E]/40 shrink-0" />
+                              <Tag size={15} className="text-foreground/40 shrink-0" />
                               <span
                                  className="text-xs sm:text-sm px-2 py-0.5 rounded"
                                  style={{
@@ -292,7 +292,7 @@ export default function ReminderDetailPage() {
                         onClick={handleToggle}
                         className={`w-full px-4 py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center gap-2 ${
                            reminder.is_completed
-                              ? "border-2 border-[#2E2E2E] text-[#2E2E2E] hover:bg-[#2E2E2E] hover:text-[#F8F4EE]"
+                              ? "border-2 border-foreground text-foreground hover:bg-foreground hover:text-background"
                               : "bg-green-500 text-white hover:bg-green-600"
                         }`}
                      >
@@ -301,14 +301,14 @@ export default function ReminderDetailPage() {
                      </button>
 
                      {/* Danger zone */}
-                     <div className="flex items-center gap-4 pt-4 border-t border-[#2E2E2E]/10">
+                     <div className="flex items-center gap-4 pt-4 border-t border-foreground/10">
                         <button
                            onClick={() => setEditing(true)}
-                           className="flex items-center gap-2 px-4 py-2 border border-[#2E2E2E] rounded-md text-xs sm:text-sm text-[#2E2E2E] hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors cursor-pointer"
+                           className="flex items-center gap-2 px-4 py-2 border border-foreground rounded-md text-xs sm:text-sm text-foreground hover:bg-foreground hover:text-background transition-colors cursor-pointer"
                         >
                            Edit
                         </button>
-   
+
                         <DeleteConfirm
                            title="Delete"
                            message={`Are you sure you want to delete "${reminder.title}"? All check-in history will be lost.`}

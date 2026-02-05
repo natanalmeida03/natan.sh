@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface StreakCalendarProps {
-   loggedDates: string[]; 
+   loggedDates: string[];
    month: number; // 0-11
    year: number;
    onPrevMonth: () => void;
@@ -75,23 +75,23 @@ export default function StreakCalendar({
          <div className="flex items-center justify-between mb-3">
             <button
                onClick={onPrevMonth}
-               className="p-1 text-[#2E2E2E]/60 hover:text-[#2E2E2E] transition-colors cursor-pointer"
+               className="p-1 text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
             >
                <ChevronLeft size={18} />
             </button>
 
             <div className="text-center">
-               <span className="text-sm font-semibold text-[#2E2E2E] capitalize">
+               <span className="text-sm font-semibold text-foreground capitalize">
                   {monthName}
                </span>
-               <span className="text-[10px] font-mono text-[#2E2E2E]/50 ml-2">
+               <span className="text-[10px] font-mono text-foreground/50 ml-2">
                   {loggedCount}d
                </span>
             </div>
 
             <button
                onClick={onNextMonth}
-               className="p-1 text-[#2E2E2E]/60 hover:text-[#2E2E2E] transition-colors cursor-pointer"
+               className="p-1 text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
             >
                <ChevronRight size={18} />
             </button>
@@ -102,7 +102,7 @@ export default function StreakCalendar({
             {WEEKDAYS.map((day, i) => (
                <div
                   key={i}
-                  className="text-[10px] font-mono text-[#2E2E2E]/40 text-center"
+                  className="text-[10px] font-mono text-foreground/40 text-center"
                >
                   {day}
                </div>
@@ -118,11 +118,11 @@ export default function StreakCalendar({
                      !cell.day
                         ? ""
                         : cell.isFuture
-                        ? "text-[#2E2E2E]/20"
+                        ? "text-foreground/20"
                         : cell.isLogged
                         ? "text-white font-bold"
-                        : "text-[#2E2E2E]/50"
-                  } ${cell.isToday && !cell.isLogged ? "ring-1 ring-[#2E2E2E]/30" : ""}`}
+                        : "text-foreground/50"
+                  } ${cell.isToday && !cell.isLogged ? "ring-1 ring-foreground/30" : ""}`}
                   style={
                      cell.isLogged
                         ? { backgroundColor: color }

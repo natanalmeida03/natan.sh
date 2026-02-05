@@ -52,7 +52,7 @@ export default function HabitCard({
          className={`relative border rounded-md p-3 sm:p-4 transition-all cursor-pointer ${
             isLoggedToday
                ? "border-green-400 bg-green-50/50"
-               : "border-[#2E2E2E]/20 bg-[#F8F4EE]"
+               : "border-foreground/20 bg-background"
          } ${!habit.is_active ? "opacity-50" : ""}`}
       >
          <div className="flex items-start gap-3">
@@ -63,7 +63,7 @@ export default function HabitCard({
                className={`shrink-0 mt-0.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed ${
                   isLoggedToday
                      ? "bg-green-500 text-white"
-                     : "border-2 border-[#2E2E2E]/30 text-transparent hover:border-green-400 hover:text-green-400"
+                     : "border-2 border-foreground/30 text-transparent hover:border-green-400 hover:text-green-400"
                }`}
             >
                <Check size={16} strokeWidth={3} />
@@ -74,8 +74,8 @@ export default function HabitCard({
                <div className="flex items-center gap-2">
                   {habit.icon && <span className="text-base">{habit.icon}</span>}
                   <h3
-                     className={`text-sm sm:text-base font-semibold text-[#2E2E2E] truncate ${
-                        isLoggedToday ? "line-through text-[#2E2E2E]/50" : ""
+                     className={`text-sm sm:text-base font-semibold text-foreground truncate ${
+                        isLoggedToday ? "line-through text-foreground/50" : ""
                      }`}
                   >
                      {habit.title}
@@ -83,7 +83,7 @@ export default function HabitCard({
                </div>
 
                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className="text-[10px] sm:text-xs font-mono text-[#2E2E2E]/60 bg-[#2E2E2E]/5 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] sm:text-xs font-mono text-foreground/60 bg-foreground/5 px-1.5 py-0.5 rounded">
                      {frequencyLabel()}
                   </span>
 
@@ -93,8 +93,8 @@ export default function HabitCard({
                         style={{
                            backgroundColor: habit.categories.color
                               ? `${habit.categories.color}20`
-                              : "#2E2E2E10",
-                           color: habit.categories.color || "#2E2E2E",
+                              : "color-mix(in srgb, var(--foreground1) 12%, transparent)",
+                           color: habit.categories.color || "var(--foreground1)",
                         }}
                      >
                         {habit.categories.name}
@@ -117,7 +117,7 @@ export default function HabitCard({
                      e.stopPropagation();
                      await onToggleActive(habit.id);
                   }}
-                  className="p-1.5 text-[#2E2E2E]/40 hover:text-[#2E2E2E] transition-colors cursor-pointer rounded-md hover:bg-[#2E2E2E]/5"
+                  className="p-1.5 text-foreground/40 hover:text-foreground transition-colors cursor-pointer rounded-md hover:bg-foreground/5"
                   title={habit.is_active ? "pause" : "activate"}
                >
                   {habit.is_active ? <Pause size={15} /> : <Power size={15} />}
@@ -127,7 +127,7 @@ export default function HabitCard({
                      e.stopPropagation();
                      await onDelete(habit.id);
                   }}
-                  className="p-1.5 text-[#2E2E2E]/40 hover:text-red-500 transition-colors cursor-pointer rounded-md hover:bg-red-50"
+                  className="p-1.5 text-foreground/40 hover:text-red-500 transition-colors cursor-pointer rounded-md hover:bg-red-50"
                   title="delete"
                >
                   <Trash2 size={15} />

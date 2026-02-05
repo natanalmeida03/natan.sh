@@ -45,14 +45,14 @@ export default function DeleteConfirm({
                   className="absolute inset-0 bg-black/30"
                   onClick={() => setOpen(false)}
                />
-               <div className="relative bg-[#F8F4EE] border border-[#2E2E2E]/15 rounded-xl p-5 w-full max-w-sm shadow-xl">
-                  <p className="text-sm text-[#2E2E2E] font-semibold mb-1">{title}</p>
-                  <p className="text-xs sm:text-sm text-[#2E2E2E]/70 mb-4">{message}</p>
+               <div className="relative bg-background border border-foreground/15 rounded-xl p-5 w-full max-w-sm shadow-xl">
+                  <p className="text-sm text-foreground font-semibold mb-1">{title}</p>
+                  <p className="text-xs sm:text-sm text-foreground/70 mb-4">{message}</p>
 
                   <div className="flex gap-2">
                      <button
                         onClick={() => setOpen(false)}
-                        className="flex-1 px-4 py-2 border-2 border-[#2E2E2E] text-[#2E2E2E] rounded-lg font-medium text-xs sm:text-sm hover:bg-[#2E2E2E] hover:text-[#F8F4EE] transition-colors cursor-pointer"
+                        className="flex-1 px-4 py-2 border-2 border-foreground text-foreground rounded-lg font-medium text-xs sm:text-sm hover:bg-foreground hover:text-background transition-colors cursor-pointer"
                      >
                         Cancel
                      </button>
