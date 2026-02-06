@@ -48,13 +48,6 @@ function ProfileCard() {
       const savedColor = localStorage.getItem("avatarColor");
       if (savedColor) setAvatarColor(savedColor);
 
-      const savedTheme = localStorage.getItem("theme") || "light";
-      setCurrentTheme(savedTheme);
-
-      if (savedTheme !== "light") {
-         document.documentElement.setAttribute("data-theme", savedTheme);
-      }
-
       loadDailyQuote();
       loadProfile();
    }, []);
