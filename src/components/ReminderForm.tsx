@@ -17,6 +17,7 @@ interface ReminderFormData {
    due_time: string;
    is_recurring: boolean;
    recurrence_type: string;
+   recurrence_days: string[]; // e.g. ["MO", "WE", "FR"]
    recurrence_end_date: string;
 }
 
@@ -39,6 +40,20 @@ export default function ReminderForm({
    const defaultDate = now.toISOString().split("T")[0];
    const defaultTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
+   // Parse initial days from recurrence_type if it contains BYDAY
+   function parseInitialDays(): string[] {
+      const rule = initialData?.recurrence_type || "";
+      const match = rule.match(/BYDAY=([A-Z,]+)/);
+      if (match) return match[1].split(",");
+      return initialData?.recurrence_days || [];
+   }
+
+   function parseInitialRecurrenceType(): string {
+      const rule = initialData?.recurrence_type || "FREQ=DAILY;INTERVAL=1";
+      if (rule.includes("BYDAY=")) return "CUSTOM_DAYS";
+      return rule;
+   }
+
    const [form, setForm] = useState<ReminderFormData>({
       title: initialData?.title || "",
       description: initialData?.description || "",
@@ -46,7 +61,8 @@ export default function ReminderForm({
       due_date: initialData?.due_date || defaultDate,
       due_time: initialData?.due_time || defaultTime,
       is_recurring: initialData?.is_recurring || false,
-      recurrence_type: initialData?.recurrence_type || "FREQ=DAILY;INTERVAL=1",
+      recurrence_type: parseInitialRecurrenceType(),
+      recurrence_days: parseInitialDays(),
       recurrence_end_date: initialData?.recurrence_end_date || "",
    });
 
@@ -58,7 +74,18 @@ export default function ReminderForm({
       setLoading(true);
       setError(null);
 
-      const result = await onSubmit(form);
+      // Build final form data, resolving custom days into recurrence_type
+      const finalForm = { ...form };
+      if (form.is_recurring && form.recurrence_type === "CUSTOM_DAYS") {
+         if (form.recurrence_days.length === 0) {
+            setError("Select at least one day of the week");
+            setLoading(false);
+            return;
+         }
+         finalForm.recurrence_type = `FREQ=WEEKLY;BYDAY=${form.recurrence_days.join(",")}`;
+      }
+
+      const result = await onSubmit(finalForm);
 
       if (result?.error) {
          setError(result.error);
@@ -69,6 +96,25 @@ export default function ReminderForm({
    function updateField<K extends keyof ReminderFormData>(key: K, value: ReminderFormData[K]) {
       setForm((prev) => ({ ...prev, [key]: value }));
    }
+
+   function toggleDay(day: string) {
+      setForm((prev) => ({
+         ...prev,
+         recurrence_days: prev.recurrence_days.includes(day)
+            ? prev.recurrence_days.filter((d) => d !== day)
+            : [...prev.recurrence_days, day],
+      }));
+   }
+
+   const WEEK_DAYS = [
+      { key: "MO", label: "Mon" },
+      { key: "TU", label: "Tue" },
+      { key: "WE", label: "Wed" },
+      { key: "TH", label: "Thu" },
+      { key: "FR", label: "Fri" },
+      { key: "SA", label: "Sat" },
+      { key: "SU", label: "Sun" },
+   ];
 
    return (
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -176,31 +222,57 @@ export default function ReminderForm({
 
          {/* Recurrence options */}
          {form.is_recurring && (
-            <div className="flex flex-col sm:flex-row gap-3 pl-0 ">
-               <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 flex-1">
-                  <legend className="text-xs text-foreground px-1">Recurrency</legend>
-                  <select
-                     value={form.recurrence_type}
-                     onChange={(e) => updateField("recurrence_type", e.target.value)}
-                     className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
-                  >
-                     <option value="FREQ=DAILY;INTERVAL=1">Daily</option>
-                     <option value="FREQ=WEEKLY;INTERVAL=1">Weekly</option>
-                     <option value="FREQ=MONTHLY;INTERVAL=1">Monthly</option>
-                     <option value="FREQ=YEARLY;INTERVAL=1">Yearly</option>
-                  </select>
-               </fieldset>
+            <div className="flex flex-col gap-3 pl-0">
+               <div className="flex flex-col sm:flex-row gap-3">
+                  <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 flex-1">
+                     <legend className="text-xs text-foreground px-1">Recurrency</legend>
+                     <select
+                        value={form.recurrence_type}
+                        onChange={(e) => updateField("recurrence_type", e.target.value)}
+                        className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                     >
+                        <option value="FREQ=DAILY;INTERVAL=1">Daily</option>
+                        <option value="FREQ=WEEKLY;INTERVAL=1">Weekly</option>
+                        <option value="CUSTOM_DAYS">Custom days</option>
+                        <option value="FREQ=MONTHLY;INTERVAL=1">Monthly</option>
+                        <option value="FREQ=YEARLY;INTERVAL=1">Yearly</option>
+                     </select>
+                  </fieldset>
 
-               <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 flex-1">
-                  <legend className="text-xs text-foreground px-1">repeat until</legend>
-                  <input
-                     type="date"
-                     value={form.recurrence_end_date}
-                     onChange={(e) => updateField("recurrence_end_date", e.target.value)}
-                     className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
-                     placeholder="Sem limite"
-                  />
-               </fieldset>
+                  <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0 flex-1">
+                     <legend className="text-xs text-foreground px-1">repeat until</legend>
+                     <input
+                        type="date"
+                        value={form.recurrence_end_date}
+                        onChange={(e) => updateField("recurrence_end_date", e.target.value)}
+                        className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
+                        placeholder="Sem limite"
+                     />
+                  </fieldset>
+               </div>
+
+               {/* Day picker for custom days */}
+               {form.recurrence_type === "CUSTOM_DAYS" && (
+                  <div className="flex gap-1.5 flex-wrap">
+                     {WEEK_DAYS.map((day) => {
+                        const selected = form.recurrence_days.includes(day.key);
+                        return (
+                           <button
+                              key={day.key}
+                              type="button"
+                              onClick={() => toggleDay(day.key)}
+                              className={`px-3 py-1.5 rounded-md text-xs font-mono cursor-pointer transition-colors ${
+                                 selected
+                                    ? "bg-foreground text-background"
+                                    : "border border-foreground/30 text-foreground/60 hover:border-foreground hover:text-foreground"
+                              }`}
+                           >
+                              {day.label}
+                           </button>
+                        );
+                     })}
+                  </div>
+               )}
             </div>
          )}
 

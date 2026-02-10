@@ -22,6 +22,7 @@ interface ReminderFormData {
    due_time: string;
    is_recurring: boolean;
    recurrence_type: string;
+   recurrence_days: string[];
    recurrence_end_date: string;
 }
 

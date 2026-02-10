@@ -18,6 +18,9 @@ interface Habit {
   title: string;
   icon?: string | null;
   color?: string | null;
+  frequency_type?: string | null;
+  is_active?: boolean;
+  created_at?: string | null;
 }
 
 interface Streak {
@@ -184,12 +187,25 @@ export default function HomePage() {
       ]);
 
       const logEntries = (habitLogsRes.data || []) as { habit_id: string }[];
-      const dayHabits = habits.map((h) => ({
-        id: h.id,
-        title: h.title,
-        icon: h.icon,
-        logged: logEntries.some((l) => l.habit_id === h.id),
-      }));
+      const targetDate = new Date(dateStr + "T12:00:00");
+
+      // Filter habits that should appear on this date
+      const dayHabits = habits
+        .filter((h) => {
+          // Only show habits created on or before this date
+          if (h.created_at && new Date(h.created_at) > targetDate) return false;
+
+          const freq = h.frequency_type || "daily";
+          if (freq === "daily") return true;
+          // weekly and monthly habits show every day (user tracks them manually)
+          return true;
+        })
+        .map((h) => ({
+          id: h.id,
+          title: h.title,
+          icon: h.icon,
+          logged: logEntries.some((l) => l.habit_id === h.id),
+        }));
 
       return {
         note: noteRes.data
@@ -212,7 +228,19 @@ export default function HomePage() {
 
       const noteDates = new Set((notesRes.data || []) as string[]);
       const reminderDates = new Set((remindersRes.data || []) as string[]);
-      const habitDates = new Set((habitsRes.data || []) as string[]);
+      const habitLogDates = new Set((habitsRes.data || []) as string[]);
+
+      // If user has active habits, mark all days of the month as having habits
+      const habitDates = new Set<string>();
+      if (habits.length > 0) {
+        const lastDay = new Date(year, month, 0).getDate();
+        for (let d = 1; d <= lastDay; d++) {
+          const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+          habitDates.add(dateStr);
+        }
+      }
+      // Also include days with actual logs
+      habitLogDates.forEach((d) => habitDates.add(d));
 
       const allDates = new Set([...noteDates, ...reminderDates, ...habitDates]);
 
@@ -227,7 +255,7 @@ export default function HomePage() {
 
       return markers;
     },
-    []
+    [habits]
   );
 
   const today = new Date().toLocaleDateString("en-us", {

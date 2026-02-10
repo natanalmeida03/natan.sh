@@ -10,6 +10,115 @@ interface ReminderInput {
     recurrence_end_at?: string | null;
 }
 
+// ─── Helpers de recorrência ──────────────────────────────────────────────
+
+const ICAL_DAY_TO_JS: Record<string, number> = {
+    SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6,
+};
+
+function getNextOccurrence(currentDue: Date, rule: string): Date | null {
+    const next = new Date(currentDue);
+
+    if (rule.includes("FREQ=DAILY")) {
+        next.setDate(next.getDate() + 1);
+        return next;
+    }
+
+    if (rule.includes("FREQ=MONTHLY")) {
+        next.setMonth(next.getMonth() + 1);
+        return next;
+    }
+
+    if (rule.includes("FREQ=YEARLY")) {
+        next.setFullYear(next.getFullYear() + 1);
+        return next;
+    }
+
+    // FREQ=WEEKLY with optional BYDAY
+    const byDayMatch = rule.match(/BYDAY=([A-Z,]+)/);
+    if (byDayMatch) {
+        const targetDays = byDayMatch[1].split(",").map((d) => ICAL_DAY_TO_JS[d]).filter((d) => d !== undefined).sort((a, b) => a - b);
+        if (targetDays.length === 0) return null;
+
+        const currentDay = next.getDay();
+        // Find next target day after current
+        const nextDay = targetDays.find((d) => d > currentDay);
+        if (nextDay !== undefined) {
+            next.setDate(next.getDate() + (nextDay - currentDay));
+        } else {
+            // Wrap to first day of next week
+            next.setDate(next.getDate() + (7 - currentDay + targetDays[0]));
+        }
+        return next;
+    }
+
+    if (rule.includes("FREQ=WEEKLY")) {
+        next.setDate(next.getDate() + 7);
+        return next;
+    }
+
+    return null;
+}
+
+/** Check if a recurring reminder should appear on a specific date */
+function matchesRecurrence(dueAt: Date, rule: string, targetDate: string, endAt?: string | null): boolean {
+    const target = new Date(targetDate + "T12:00:00");
+    const dueDate = new Date(dueAt.getFullYear(), dueAt.getMonth(), dueAt.getDate());
+    const targetDay = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+
+    // Target must be on or after the original due date
+    if (targetDay < dueDate) return false;
+
+    // Check recurrence_end_at
+    if (endAt) {
+        const end = new Date(endAt);
+        if (targetDay > end) return false;
+    }
+
+    // Exact match with due_at date
+    if (targetDay.getTime() === dueDate.getTime()) return true;
+
+    if (rule.includes("FREQ=DAILY")) {
+        return true;
+    }
+
+    if (rule.includes("FREQ=MONTHLY")) {
+        return target.getDate() === dueAt.getDate();
+    }
+
+    if (rule.includes("FREQ=YEARLY")) {
+        return target.getDate() === dueAt.getDate() && target.getMonth() === dueAt.getMonth();
+    }
+
+    // FREQ=WEEKLY with BYDAY
+    const byDayMatch = rule.match(/BYDAY=([A-Z,]+)/);
+    if (byDayMatch) {
+        const targetDays = byDayMatch[1].split(",").map((d) => ICAL_DAY_TO_JS[d]).filter((d) => d !== undefined);
+        return targetDays.includes(target.getDay());
+    }
+
+    if (rule.includes("FREQ=WEEKLY")) {
+        return target.getDay() === dueAt.getDay();
+    }
+
+    return false;
+}
+
+/** Get all dates in a month range that a recurring reminder would appear on */
+function getRecurrenceDatesInMonth(dueAt: Date, rule: string, year: number, month: number, endAt?: string | null): string[] {
+    const dates: string[] = [];
+    const lastDay = new Date(year, month, 0).getDate();
+
+    for (let d = 1; d <= lastDay; d++) {
+        const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        if (matchesRecurrence(dueAt, rule, dateStr, endAt)) {
+            dates.push(dateStr);
+        }
+    }
+
+    return dates;
+}
+
 export async function getReminders(options?: {
     completed?: boolean;
     category_id?: string;
@@ -210,10 +319,10 @@ export async function toggleReminderComplete(reminderId: string) {
         return { error: "User not authenticated" };
     }
 
-    // Busca o estado atual
+    // Busca o estado atual incluindo recurrence_rule
     const { data: current, error: fetchError } = await supabase
         .from("reminders")
-        .select("is_completed")
+        .select("is_completed, recurrence_rule, recurrence_end_at, due_at")
         .eq("id", reminderId)
         .eq("user_id", user.id)
         .single();
@@ -223,6 +332,40 @@ export async function toggleReminderComplete(reminderId: string) {
     }
 
     const newStatus = !current.is_completed;
+
+    // Se está marcando como completo E tem recorrência, avança para próxima data
+    if (newStatus && current.recurrence_rule) {
+        const currentDue = new Date(current.due_at);
+        const nextDue = getNextOccurrence(currentDue, current.recurrence_rule);
+
+        // Verifica se próxima ocorrência está dentro do limite
+        const pastEnd = nextDue && current.recurrence_end_at
+            ? nextDue > new Date(current.recurrence_end_at)
+            : false;
+
+        if (nextDue && !pastEnd) {
+            // Avança due_at para próxima ocorrência, mantém pendente
+            const { data, error } = await supabase
+                .from("reminders")
+                .update({
+                    due_at: nextDue.toISOString(),
+                    is_completed: false,
+                    completed_at: null,
+                })
+                .eq("id", reminderId)
+                .eq("user_id", user.id)
+                .select()
+                .single();
+
+            if (error) {
+                return { error: error.message };
+            }
+
+            return { success: true, data, advanced: true };
+        }
+
+        // Passou do limite de recorrência, marca como completo normalmente
+    }
 
     const { data, error } = await supabase
         .from("reminders")
@@ -269,7 +412,7 @@ export async function deleteReminder(reminderId: string) {
 
 // ─── Novas funções para o calendário interativo ─────────────────────────
 
-// Busca todos os lembretes de uma data específica (dia inteiro)
+// Busca todos os lembretes de uma data específica (inclui recorrências expandidas)
 export async function getRemindersByDate(date: string) {
     const supabase = await createClient();
 
@@ -282,11 +425,11 @@ export async function getRemindersByDate(date: string) {
         return { error: "User not authenticated" };
     }
 
-    // Intervalo: início do dia até fim do dia
+    // Busca lembretes com due_at nesse dia (ocorrência direta)
     const from = `${date}T00:00:00.000Z`;
     const to = `${date}T23:59:59.999Z`;
 
-    const { data, error } = await supabase
+    const { data: directReminders, error: directError } = await supabase
         .from("reminders")
         .select("*, categories(id, name, color, icon)")
         .eq("user_id", user.id)
@@ -294,14 +437,40 @@ export async function getRemindersByDate(date: string) {
         .lte("due_at", to)
         .order("due_at", { ascending: true });
 
-    if (error) {
-        return { error: error.message };
+    if (directError) {
+        return { error: directError.message };
     }
 
-    return { data: data || [] };
+    // Busca todos os lembretes recorrentes do usuário (due_at <= date, não completados)
+    const { data: recurringReminders, error: recurringError } = await supabase
+        .from("reminders")
+        .select("*, categories(id, name, color, icon)")
+        .eq("user_id", user.id)
+        .eq("is_completed", false)
+        .not("recurrence_rule", "is", null)
+        .lte("due_at", to);
+
+    if (recurringError) {
+        return { error: recurringError.message };
+    }
+
+    const directIds = new Set((directReminders || []).map((r) => r.id));
+
+    // Filtra recorrentes que batem com a data mas não estão já nos diretos
+    const expandedRecurring = (recurringReminders || []).filter((r) => {
+        if (directIds.has(r.id)) return false;
+        return matchesRecurrence(
+            new Date(r.due_at),
+            r.recurrence_rule,
+            date,
+            r.recurrence_end_at
+        );
+    });
+
+    return { data: [...(directReminders || []), ...expandedRecurring] };
 }
 
-// Busca todas as datas do mês que possuem pelo menos um lembrete
+// Busca todas as datas do mês que possuem pelo menos um lembrete (inclui recorrências)
 export async function getRemindersForMonth(year: number, month: number) {
     const supabase = await createClient();
 
@@ -318,22 +487,46 @@ export async function getRemindersForMonth(year: number, month: number) {
     const lastDay = new Date(year, month, 0).getDate();
     const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}T23:59:59.999Z`;
 
-    const { data, error } = await supabase
+    // Lembretes diretos no mês
+    const { data: directData, error: directError } = await supabase
         .from("reminders")
         .select("due_at")
         .eq("user_id", user.id)
         .gte("due_at", from)
         .lte("due_at", to);
 
-    if (error) {
-        return { error: error.message };
+    if (directError) {
+        return { error: directError.message };
     }
 
-    // Extrai datas únicas no formato "YYYY-MM-DD"
-    const uniqueDates = [
-        ...new Set(
-            (data || []).map((r) => (r.due_at as string).split("T")[0])
-        ),
-    ];
-    return { data: uniqueDates };
+    const uniqueDates = new Set(
+        (directData || []).map((r) => (r.due_at as string).split("T")[0])
+    );
+
+    // Lembretes recorrentes que começaram antes ou durante o mês
+    const { data: recurringData, error: recurringError } = await supabase
+        .from("reminders")
+        .select("due_at, recurrence_rule, recurrence_end_at")
+        .eq("user_id", user.id)
+        .eq("is_completed", false)
+        .not("recurrence_rule", "is", null)
+        .lte("due_at", to);
+
+    if (recurringError) {
+        return { error: recurringError.message };
+    }
+
+    // Expande recorrências para cada dia do mês
+    (recurringData || []).forEach((r) => {
+        const expanded = getRecurrenceDatesInMonth(
+            new Date(r.due_at),
+            r.recurrence_rule,
+            year,
+            month,
+            r.recurrence_end_at
+        );
+        expanded.forEach((d) => uniqueDates.add(d));
+    });
+
+    return { data: [...uniqueDates] };
 }

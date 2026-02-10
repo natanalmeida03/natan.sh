@@ -57,8 +57,8 @@ export default function RemindersPage() {
    async function handleToggle(id: string) {
       const res = await toggleReminderComplete(id);
       if (!res.error) {
-         // Remove da lista atual (muda de tab)
-         setReminders((prev) => prev.filter((r) => r.id !== id));
+         // Reload list — recurring reminders advance due_at instead of completing
+         await loadData();
       }
    }
 

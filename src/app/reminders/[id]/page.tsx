@@ -49,11 +49,21 @@ interface ReminderFormData {
    due_time: string;
    is_recurring: boolean;
    recurrence_type: string;
+   recurrence_days: string[];
    recurrence_end_date: string;
 }
 
+const DAY_LABELS: Record<string, string> = {
+   MO: "Mon", TU: "Tue", WE: "Wed", TH: "Thu", FR: "Fri", SA: "Sat", SU: "Sun",
+};
+
 function parseRecurrence(rule?: string | null): string | null {
    if (!rule) return null;
+   const byDayMatch = rule.match(/BYDAY=([A-Z,]+)/);
+   if (byDayMatch) {
+      const days = byDayMatch[1].split(",").map((d) => DAY_LABELS[d] || d);
+      return days.join(", ");
+   }
    if (rule.includes("DAILY")) return "Daily";
    if (rule.includes("WEEKLY")) return "Weekly";
    if (rule.includes("MONTHLY")) return "Monthly";
