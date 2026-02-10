@@ -19,6 +19,7 @@ interface ReminderFormData {
    recurrence_type: string;
    recurrence_days: string[]; // e.g. ["MO", "WE", "FR"]
    recurrence_end_date: string;
+   notify_email: boolean;
 }
 
 interface ReminderFormProps {
@@ -64,6 +65,7 @@ export default function ReminderForm({
       recurrence_type: parseInitialRecurrenceType(),
       recurrence_days: parseInitialDays(),
       recurrence_end_date: initialData?.recurrence_end_date || "",
+      notify_email: initialData?.notify_email || false,
    });
 
    const [loading, setLoading] = useState(false);
@@ -275,6 +277,25 @@ export default function ReminderForm({
                )}
             </div>
          )}
+
+         {/* Email notification toggle */}
+         <div
+            className="flex items-center gap-3 cursor-pointer select-none"
+            onClick={() => updateField("notify_email", !form.notify_email)}
+         >
+            <div
+               className={`w-9 h-5 rounded-full transition-colors relative ${
+                  form.notify_email ? "bg-foreground" : "bg-foreground/20"
+               }`}
+            >
+               <div
+                  className={`absolute top-0.5 w-4 h-4 rounded-full bg-background transition-transform ${
+                     form.notify_email ? "translate-x-4" : "translate-x-0.5"
+                  }`}
+               />
+            </div>
+            <span className="text-xs sm:text-sm text-foreground">Email me 1 hour before</span>
+         </div>
 
          {/* Actions */}
          <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">

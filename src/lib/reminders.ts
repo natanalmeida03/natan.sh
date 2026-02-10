@@ -8,6 +8,7 @@ interface ReminderInput {
     due_at: string; // ISO string
     recurrence_rule?: string | null;
     recurrence_end_at?: string | null;
+    notify_email?: boolean;
 }
 
 // ─── Helpers de recorrência ──────────────────────────────────────────────
@@ -251,6 +252,7 @@ export async function createReminder(input: ReminderInput) {
             due_at: input.due_at,
             recurrence_rule: input.recurrence_rule || null,
             recurrence_end_at: input.recurrence_end_at || null,
+            notify_email: input.notify_email ?? false,
         })
         .select("*, categories(id, name, color, icon)")
         .single();
@@ -287,6 +289,13 @@ export async function updateReminder(
         updates.recurrence_rule = input.recurrence_rule;
     if (input.recurrence_end_at !== undefined)
         updates.recurrence_end_at = input.recurrence_end_at;
+    if (input.notify_email !== undefined)
+        updates.notify_email = input.notify_email;
+
+    // Reset notified_at when due_at or notify_email changes so the user gets notified again
+    if (input.due_at !== undefined || input.notify_email !== undefined) {
+        updates.notified_at = null;
+    }
 
     if (Object.keys(updates).length === 0) {
         return { error: "Nothing to update" };
@@ -351,6 +360,7 @@ export async function toggleReminderComplete(reminderId: string) {
                     due_at: nextDue.toISOString(),
                     is_completed: false,
                     completed_at: null,
+                    notified_at: null,
                 })
                 .eq("id", reminderId)
                 .eq("user_id", user.id)

@@ -9,6 +9,7 @@ import {
    AlertTriangle,
    CheckCircle2,
    Tag,
+   Mail,
 } from "lucide-react";
 import ReminderForm from "@/components/ReminderForm";
 import DeleteConfirm from "@/components/DeleteConfirm";
@@ -30,6 +31,7 @@ interface Reminder {
    completed_at?: string | null;
    recurrence_rule?: string | null;
    recurrence_end_at?: string | null;
+   notify_email?: boolean;
    category_id?: string | null;
    categories?: { id: string; name: string; color?: string | null; icon?: string | null } | null;
 }
@@ -51,6 +53,7 @@ interface ReminderFormData {
    recurrence_type: string;
    recurrence_days: string[];
    recurrence_end_date: string;
+   notify_email: boolean;
 }
 
 const DAY_LABELS: Record<string, string> = {
@@ -118,6 +121,7 @@ export default function ReminderDetailPage() {
          recurrence_end_at: data.is_recurring && data.recurrence_end_date
             ? new Date(`${data.recurrence_end_date}T23:59:59`).toISOString()
             : null,
+         notify_email: data.notify_email,
       });
 
       if (res.error) {
@@ -174,6 +178,7 @@ export default function ReminderDetailPage() {
       recurrence_end_date: reminder.recurrence_end_at
          ? new Date(reminder.recurrence_end_at).toISOString().split("T")[0]
          : "",
+      notify_email: reminder.notify_email ?? false,
    };
 
    return (
@@ -292,6 +297,16 @@ export default function ReminderDetailPage() {
                               >
                                  {reminder.categories.icon ? `${reminder.categories.icon} ` : ""}
                                  {reminder.categories.name}
+                              </span>
+                           </div>
+                        )}
+
+                        {/* Email notification */}
+                        {reminder.notify_email && (
+                           <div className="flex items-center gap-2">
+                              <Mail size={15} className="text-purple-400 shrink-0" />
+                              <span className="text-xs sm:text-sm text-purple-600 font-mono">
+                                 Email 1h before
                               </span>
                            </div>
                         )}

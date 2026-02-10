@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Check, Trash2, Clock, Repeat, AlertTriangle } from "lucide-react";
+import { Check, Trash2, Clock, Repeat, AlertTriangle, Mail } from "lucide-react";
 
 interface ReminderCardProps {
    reminder: {
@@ -11,6 +11,7 @@ interface ReminderCardProps {
       is_completed: boolean;
       completed_at?: string | null;
       recurrence_rule?: string | null;
+      notify_email?: boolean;
       categories?: { name: string; color?: string | null } | null;
    };
    onToggle: (id: string) => Promise<void>;
@@ -143,6 +144,14 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                      <span className="text-[10px] sm:text-xs font-mono text-blue-500 flex items-center gap-0.5 bg-blue-50 px-1.5 py-0.5 rounded">
                         <Repeat size={10} />
                         {recurrenceLabel}
+                     </span>
+                  )}
+
+                  {/* Email notification */}
+                  {reminder.notify_email && (
+                     <span className="text-[10px] sm:text-xs font-mono text-purple-500 flex items-center gap-0.5 bg-purple-50 px-1.5 py-0.5 rounded">
+                        <Mail size={10} />
+                        Email
                      </span>
                   )}
 
