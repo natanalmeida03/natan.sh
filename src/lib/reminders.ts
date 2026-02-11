@@ -269,6 +269,7 @@ export async function createReminder(input: ReminderInput) {
 
     // Best-effort Google Calendar sync
     try {
+        console.log("[reminders] Attempting calendar sync for user:", user.id);
         const eventId = await createCalendarEvent(user.id, {
             title: input.title.trim(),
             description: input.description,
@@ -276,15 +277,20 @@ export async function createReminder(input: ReminderInput) {
             recurrence_rule: input.recurrence_rule,
             recurrence_end_at: input.recurrence_end_at,
         });
+        console.log("[reminders] Calendar event result:", eventId);
         if (eventId && data) {
-            await supabaseAdmin
+            const { error: updateError } = await supabaseAdmin
                 .from("reminders")
                 .update({ google_calendar_event_id: eventId })
                 .eq("id", data.id);
-            data.google_calendar_event_id = eventId;
+            if (updateError) {
+                console.error("[reminders] Failed to save eventId:", updateError.message);
+            } else {
+                data.google_calendar_event_id = eventId;
+            }
         }
-    } catch {
-        // Silent fail — Calendar sync is best-effort
+    } catch (e) {
+        console.error("[reminders] Calendar sync error:", e);
     }
 
     return { success: true, data };

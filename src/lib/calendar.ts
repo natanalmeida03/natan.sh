@@ -17,19 +17,29 @@ interface CalendarEventInput {
 // ─── Token Management ────────────────────────────────────────────────────
 
 async function getValidAccessToken(userId: string): Promise<string | null> {
-   const { data: tokens } = await supabaseAdmin
+   const { data: tokens, error } = await supabaseAdmin
       .from("google_tokens")
       .select("access_token, refresh_token, token_expires_at")
       .eq("user_id", userId)
       .single();
 
-   if (!tokens) return null;
+   if (error || !tokens) {
+      console.log("[calendar] No tokens found for user:", userId, error?.message);
+      return null;
+   }
 
    const expiresAt = new Date(tokens.token_expires_at).getTime();
    if (Date.now() + TOKEN_BUFFER_MS < expiresAt) {
+      console.log("[calendar] Using existing access token for user:", userId);
       return tokens.access_token;
    }
 
+   if (!tokens.refresh_token) {
+      console.log("[calendar] Token expired and no refresh_token available for user:", userId);
+      return null;
+   }
+
+   console.log("[calendar] Token expired, refreshing for user:", userId);
    return refreshAccessToken(userId, tokens.refresh_token);
 }
 
@@ -149,11 +159,17 @@ export async function createCalendarEvent(
          }
       );
 
-      if (!res.ok) return null;
+      if (!res.ok) {
+         const errBody = await res.text();
+         console.error("[calendar] Failed to create event:", res.status, errBody);
+         return null;
+      }
 
       const data = await res.json();
+      console.log("[calendar] Event created:", data.id);
       return data.id as string;
-   } catch {
+   } catch (e) {
+      console.error("[calendar] Exception creating event:", e);
       return null;
    }
 }
