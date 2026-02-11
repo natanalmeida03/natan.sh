@@ -88,6 +88,40 @@ export async function createCategory(formData: FormData) {
     return { success: true, data };
 }
 
+export async function createCategorySimple(input: { name: string; color?: string | null; icon?: string | null }) {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return { error: "User not authenticated" };
+    }
+
+    if (!input.name || input.name.trim().length === 0) {
+        return { error: "Category name is required" };
+    }
+
+    const { data, error } = await supabase
+        .from("categories")
+        .insert({
+            user_id: user.id,
+            name: input.name.trim(),
+            color: input.color || null,
+            icon: input.icon || null,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    return { success: true, data };
+}
+
 export async function updateCategory(categoryId: string, formData: FormData) {
     const supabase = await createClient();
 

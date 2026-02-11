@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Plus } from "lucide-react";
 
 interface Category {
    id: string;
@@ -25,6 +25,7 @@ interface ReminderFormData {
 interface ReminderFormProps {
    initialData?: Partial<ReminderFormData>;
    categories: Category[];
+   onCreateCategory?: (name: string) => Promise<Category | null>;
    onSubmit: (data: ReminderFormData) => Promise<{ error?: string }>;
    onCancel: () => void;
    submitLabel?: string;
@@ -33,6 +34,7 @@ interface ReminderFormProps {
 export default function ReminderForm({
    initialData,
    categories,
+   onCreateCategory,
    onSubmit,
    onCancel,
    submitLabel = "Criar lembrete",
@@ -70,6 +72,8 @@ export default function ReminderForm({
 
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState<string | null>(null);
+   const [creatingCategory, setCreatingCategory] = useState(false);
+   const [newCategoryName, setNewCategoryName] = useState("");
 
    async function handleSubmit(e: React.FormEvent) {
       e.preventDefault();
@@ -185,7 +189,7 @@ export default function ReminderForm({
          </div>
 
          {/* Category */}
-         {categories.length > 0 && (
+         <div className="flex flex-col gap-2">
             <fieldset className="border border-foreground rounded-lg px-3 pb-2 pt-0">
                <legend className="text-xs text-foreground px-1">category</legend>
                <select
@@ -193,7 +197,7 @@ export default function ReminderForm({
                   onChange={(e) => updateField("category_id", e.target.value)}
                   className="w-full bg-transparent text-foreground focus:outline-none py-1 font-mono text-sm cursor-pointer"
                >
-                  <option value="">Sem categoria</option>
+                  <option value="">No category</option>
                   {categories.map((cat) => (
                      <option key={cat.id} value={cat.id}>
                         {cat.icon ? `${cat.icon} ` : ""}{cat.name}
@@ -201,7 +205,72 @@ export default function ReminderForm({
                   ))}
                </select>
             </fieldset>
-         )}
+
+            {onCreateCategory && !creatingCategory && (
+               <button
+                  type="button"
+                  onClick={() => setCreatingCategory(true)}
+                  className="flex items-center gap-1.5 text-xs text-foreground/50 hover:text-foreground transition-colors cursor-pointer self-start"
+               >
+                  <Plus size={14} />
+                  New category
+               </button>
+            )}
+
+            {creatingCategory && (
+               <div className="flex gap-2">
+                  <input
+                     type="text"
+                     placeholder="Category name"
+                     value={newCategoryName}
+                     onChange={(e) => setNewCategoryName(e.target.value)}
+                     onKeyDown={async (e) => {
+                        if (e.key === "Enter") {
+                           e.preventDefault();
+                           if (!newCategoryName.trim() || !onCreateCategory) return;
+                           const cat = await onCreateCategory(newCategoryName.trim());
+                           if (cat) {
+                              updateField("category_id", cat.id);
+                              setNewCategoryName("");
+                              setCreatingCategory(false);
+                           }
+                        }
+                        if (e.key === "Escape") {
+                           setNewCategoryName("");
+                           setCreatingCategory(false);
+                        }
+                     }}
+                     autoFocus
+                     className="flex-1 border border-foreground/30 rounded-md px-2.5 py-1.5 bg-transparent text-foreground text-xs font-mono focus:outline-none focus:border-foreground"
+                  />
+                  <button
+                     type="button"
+                     onClick={async () => {
+                        if (!newCategoryName.trim() || !onCreateCategory) return;
+                        const cat = await onCreateCategory(newCategoryName.trim());
+                        if (cat) {
+                           updateField("category_id", cat.id);
+                           setNewCategoryName("");
+                           setCreatingCategory(false);
+                        }
+                     }}
+                     className="px-3 py-1.5 bg-foreground text-background rounded-md text-xs font-medium cursor-pointer hover:bg-accent transition-colors"
+                  >
+                     Add
+                  </button>
+                  <button
+                     type="button"
+                     onClick={() => {
+                        setNewCategoryName("");
+                        setCreatingCategory(false);
+                     }}
+                     className="px-2 py-1.5 text-foreground/40 hover:text-foreground cursor-pointer transition-colors"
+                  >
+                     <X size={14} />
+                  </button>
+               </div>
+            )}
+         </div>
 
          {/* Recurrence toggle */}
          <div

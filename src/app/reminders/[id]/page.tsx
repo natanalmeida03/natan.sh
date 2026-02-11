@@ -19,7 +19,7 @@ import {
    deleteReminder,
    toggleReminderComplete,
 } from "@/lib/reminders";
-import { getCategories } from "@/lib/categories";
+import { getCategories, createCategorySimple } from "@/lib/categories";
 import Header from "@/components/HeaderSecondary";
 
 interface Reminder {
@@ -194,6 +194,14 @@ export default function ReminderDetailPage() {
                   <ReminderForm
                      initialData={initialFormData}
                      categories={categories}
+                     onCreateCategory={async (name) => {
+                        const res = await createCategorySimple({ name });
+                        if (res.data) {
+                           setCategories((prev) => [...prev, res.data as Category]);
+                           return res.data as Category;
+                        }
+                        return null;
+                     }}
                      onSubmit={handleUpdate}
                      onCancel={() => setEditing(false)}
                      submitLabel="Salvar alterações"

@@ -1,5 +1,11 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
+import {
+    createCalendarEvent,
+    updateCalendarEvent,
+    deleteCalendarEvent,
+} from "@/lib/calendar";
+import { supabaseAdmin } from "@/utils/supabase/admin";
 
 interface ReminderInput {
     title: string;
@@ -261,6 +267,26 @@ export async function createReminder(input: ReminderInput) {
         return { error: error.message };
     }
 
+    // Best-effort Google Calendar sync
+    try {
+        const eventId = await createCalendarEvent(user.id, {
+            title: input.title.trim(),
+            description: input.description,
+            due_at: input.due_at,
+            recurrence_rule: input.recurrence_rule,
+            recurrence_end_at: input.recurrence_end_at,
+        });
+        if (eventId && data) {
+            await supabaseAdmin
+                .from("reminders")
+                .update({ google_calendar_event_id: eventId })
+                .eq("id", data.id);
+            data.google_calendar_event_id = eventId;
+        }
+    } catch {
+        // Silent fail — Calendar sync is best-effort
+    }
+
     return { success: true, data };
 }
 
@@ -311,6 +337,40 @@ export async function updateReminder(
 
     if (error) {
         return { error: error.message };
+    }
+
+    // Best-effort Google Calendar sync
+    if (data) {
+        try {
+            const calendarInput = {
+                title: data.title,
+                description: data.description,
+                due_at: data.due_at,
+                recurrence_rule: data.recurrence_rule,
+                recurrence_end_at: data.recurrence_end_at,
+            };
+            if (data.google_calendar_event_id) {
+                await updateCalendarEvent(
+                    user.id,
+                    data.google_calendar_event_id,
+                    calendarInput
+                );
+            } else {
+                const eventId = await createCalendarEvent(
+                    user.id,
+                    calendarInput
+                );
+                if (eventId) {
+                    await supabaseAdmin
+                        .from("reminders")
+                        .update({ google_calendar_event_id: eventId })
+                        .eq("id", data.id);
+                    data.google_calendar_event_id = eventId;
+                }
+            }
+        } catch {
+            // Silent fail — Calendar sync is best-effort
+        }
     }
 
     return { success: true, data };
@@ -407,6 +467,14 @@ export async function deleteReminder(reminderId: string) {
         return { error: "User not authenticated" };
     }
 
+    // Fetch the event ID before deleting
+    const { data: reminder } = await supabase
+        .from("reminders")
+        .select("google_calendar_event_id")
+        .eq("id", reminderId)
+        .eq("user_id", user.id)
+        .single();
+
     const { error } = await supabase
         .from("reminders")
         .delete()
@@ -415,6 +483,15 @@ export async function deleteReminder(reminderId: string) {
 
     if (error) {
         return { error: error.message };
+    }
+
+    // Best-effort Google Calendar sync
+    if (reminder?.google_calendar_event_id) {
+        try {
+            await deleteCalendarEvent(user.id, reminder.google_calendar_event_id);
+        } catch {
+            // Silent fail — Calendar sync is best-effort
+        }
     }
 
     return { success: true };

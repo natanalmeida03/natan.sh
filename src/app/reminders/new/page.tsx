@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import ReminderForm from "@/components/ReminderForm";
 import { createReminder } from "@/lib/reminders";
-import { getCategories } from "@/lib/categories";
+import { getCategories, createCategorySimple } from "@/lib/categories";
 import Header from "@/components/HeaderSecondary";
 
 interface Category {
@@ -70,6 +70,14 @@ export default function NewReminderPage() {
             <div className="flex items-center justify-center">
                <ReminderForm
                   categories={categories}
+                  onCreateCategory={async (name) => {
+                     const res = await createCategorySimple({ name });
+                     if (res.data) {
+                        setCategories((prev) => [...prev, res.data as Category]);
+                        return res.data as Category;
+                     }
+                     return null;
+                  }}
                   onSubmit={handleSubmit}
                   onCancel={() => router.back()}
                   submitLabel="Create reminder"
