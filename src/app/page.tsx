@@ -72,9 +72,15 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <div className="mt-3 font-mono text-xs text-muted">
-          Feito com ❤️ por NATANGOATOSO  |{" "}
-          2026 - Presente
+        <div className="mt-3 font-mono text-xs text-muted flex flex-col sm:flex-row sm:justify-between gap-1">
+          <span>
+            Feito com ❤️ por NATANGOATOSO  |{" "}
+            2026 - Presente
+          </span>
+          <span className="flex gap-3">
+            <Link href="/terms" className="hover:text-foreground transition-colors">terms</Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">privacy</Link>
+          </span>
         </div>
       </main>
     </div>
