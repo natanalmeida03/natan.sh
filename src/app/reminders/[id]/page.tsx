@@ -9,7 +9,6 @@ import {
    AlertTriangle,
    CheckCircle2,
    Tag,
-   Mail,
 } from "lucide-react";
 import ReminderForm from "@/components/ReminderForm";
 import DeleteConfirm from "@/components/DeleteConfirm";
@@ -18,6 +17,7 @@ import {
    updateReminder,
    deleteReminder,
    toggleReminderComplete,
+   getReminderCompletionLogs,
 } from "@/lib/reminders";
 import { getCategories, createCategorySimple } from "@/lib/categories";
 import Header from "@/components/HeaderSecondary";
@@ -31,7 +31,6 @@ interface Reminder {
    completed_at?: string | null;
    recurrence_rule?: string | null;
    recurrence_end_at?: string | null;
-   notify_email?: boolean;
    category_id?: string | null;
    categories?: { id: string; name: string; color?: string | null; icon?: string | null } | null;
 }
@@ -53,7 +52,12 @@ interface ReminderFormData {
    recurrence_type: string;
    recurrence_days: string[];
    recurrence_end_date: string;
-   notify_email: boolean;
+}
+
+interface ReminderCompletionLog {
+   id: string;
+   occurred_on: string;
+   completed_at: string;
 }
 
 const DAY_LABELS: Record<string, string> = {
@@ -81,19 +85,22 @@ export default function ReminderDetailPage() {
 
    const [reminder, setReminder] = useState<Reminder | null>(null);
    const [categories, setCategories] = useState<Category[]>([]);
+   const [completionLogs, setCompletionLogs] = useState<ReminderCompletionLog[]>([]);
    const [loading, setLoading] = useState(true);
    const [editing, setEditing] = useState(false);
 
    const loadData = useCallback(async () => {
       setLoading(true);
 
-      const [reminderRes, categoriesRes] = await Promise.all([
+      const [reminderRes, categoriesRes, logsRes] = await Promise.all([
          getReminderById(reminderId),
          getCategories(),
+         getReminderCompletionLogs(reminderId, { limit: 60 }),
       ]);
 
       if (reminderRes.data) setReminder(reminderRes.data as Reminder);
       if (categoriesRes.data) setCategories(categoriesRes.data as Category[]);
+      if (logsRes.data) setCompletionLogs(logsRes.data as ReminderCompletionLog[]);
 
       setLoading(false);
    }, [reminderId]);
@@ -121,7 +128,6 @@ export default function ReminderDetailPage() {
          recurrence_end_at: data.is_recurring && data.recurrence_end_date
             ? new Date(`${data.recurrence_end_date}T23:59:59`).toISOString()
             : null,
-         notify_email: data.notify_email,
       });
 
       if (res.error) {
@@ -178,7 +184,6 @@ export default function ReminderDetailPage() {
       recurrence_end_date: reminder.recurrence_end_at
          ? new Date(reminder.recurrence_end_at).toISOString().split("T")[0]
          : "",
-      notify_email: reminder.notify_email ?? false,
    };
 
    return (
@@ -309,15 +314,6 @@ export default function ReminderDetailPage() {
                            </div>
                         )}
 
-                        {/* Email notification */}
-                        {reminder.notify_email && (
-                           <div className="flex items-center gap-2">
-                              <Mail size={15} className="text-purple-400 shrink-0" />
-                              <span className="text-xs sm:text-sm text-purple-600 font-mono">
-                                 Email 1h before
-                              </span>
-                           </div>
-                        )}
                      </div>
 
                      {/* Toggle complete button */}
@@ -332,6 +328,39 @@ export default function ReminderDetailPage() {
                         <CheckCircle2 size={16} />
                         {reminder.is_completed ? "Mark as pending" : "Mark as completed"}
                      </button>
+
+                     <div className="border border-foreground/15 rounded-lg p-4">
+                        <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-3">
+                           Completion log
+                        </h3>
+                        {completionLogs.length === 0 ? (
+                           <p className="text-xs text-foreground/45 font-mono">No completions yet</p>
+                        ) : (
+                           <div className="flex flex-col gap-2">
+                              {completionLogs.map((log) => (
+                                 <div
+                                    key={log.id}
+                                    className="flex items-center justify-between border border-foreground/10 rounded-md px-3 py-2"
+                                 >
+                                    <span className="text-xs text-foreground/70 font-mono">
+                                       {new Date(`${log.occurred_on}T12:00:00`).toLocaleDateString("en-us", {
+                                          weekday: "short",
+                                          day: "2-digit",
+                                          month: "short",
+                                          year: "numeric",
+                                       })}
+                                    </span>
+                                    <span className="text-[10px] sm:text-xs text-foreground/45 font-mono">
+                                       {new Date(log.completed_at).toLocaleTimeString("en-us", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                       })}
+                                    </span>
+                                 </div>
+                              ))}
+                           </div>
+                        )}
+                     </div>
 
                      {/* Danger zone */}
                      <div className="flex items-center gap-4 pt-4 border-t border-foreground/10">

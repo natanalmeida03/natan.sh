@@ -47,6 +47,12 @@ interface WeeklyStat {
    completion_pct: number | null;
 }
 
+interface HabitLog {
+   id: string;
+   logged_date: string;
+   logged_at: string;
+}
+
 export default function HabitDetailPage() {
    const router = useRouter();
    const params = useParams();
@@ -57,6 +63,7 @@ export default function HabitDetailPage() {
    const [streak, setStreak] = useState<Streak | null>(null);
    const [weeklyStats, setWeeklyStats] = useState<WeeklyStat[]>([]);
    const [loggedDates, setLoggedDates] = useState<string[]>([]);
+   const [completionLogs, setCompletionLogs] = useState<HabitLog[]>([]);
    const [loading, setLoading] = useState(true);
    const [editing, setEditing] = useState(false);
 
@@ -68,11 +75,12 @@ export default function HabitDetailPage() {
    const loadData = useCallback(async () => {
       setLoading(true);
 
-      const [habitRes, categoriesRes, streaksRes, weeklyRes] = await Promise.all([
+      const [habitRes, categoriesRes, streaksRes, weeklyRes, logsRes] = await Promise.all([
          getHabitById(habitId),
          getCategories(),
          getHabitStreaks(),
          getHabitWeeklyStats({ habit_id: habitId }),
+         getHabitLogs(habitId, { limit: 60 }),
       ]);
 
       if (habitRes.data) setHabit(habitRes.data as Habit);
@@ -84,6 +92,7 @@ export default function HabitDetailPage() {
       }
 
       if (weeklyRes.data) setWeeklyStats(weeklyRes.data as WeeklyStat[]);
+      if (logsRes.data) setCompletionLogs(logsRes.data as HabitLog[]);
 
       setLoading(false);
    }, [habitId]);
@@ -310,6 +319,39 @@ export default function HabitDetailPage() {
                   )}
 
                   {/* Action buttons — edit + delete together at the bottom */}
+                  <div className="border border-foreground/15 rounded-md p-3 sm:p-4">
+                     <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-3">
+                        Completion log
+                     </h3>
+                     {completionLogs.length === 0 ? (
+                        <p className="text-xs text-foreground/45 font-mono">No completions yet</p>
+                     ) : (
+                        <div className="flex flex-col gap-2">
+                           {completionLogs.map((log) => (
+                              <div
+                                 key={log.id}
+                                 className="flex items-center justify-between border border-foreground/10 rounded-md px-3 py-2"
+                              >
+                                 <span className="text-xs text-foreground/70 font-mono">
+                                    {new Date(`${log.logged_date}T12:00:00`).toLocaleDateString("en-us", {
+                                       weekday: "short",
+                                       day: "2-digit",
+                                       month: "short",
+                                       year: "numeric",
+                                    })}
+                                 </span>
+                                 <span className="text-[10px] sm:text-xs text-foreground/45 font-mono">
+                                    {new Date(log.logged_at).toLocaleTimeString("en-us", {
+                                       hour: "2-digit",
+                                       minute: "2-digit",
+                                    })}
+                                 </span>
+                              </div>
+                           ))}
+                        </div>
+                     )}
+                  </div>
+
                   <div className="flex items-center gap-4 pt-4 border-t border-foreground/10">
                      <button
                         onClick={() => setEditing(true)}

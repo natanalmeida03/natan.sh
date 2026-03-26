@@ -24,7 +24,6 @@ interface ReminderFormData {
    recurrence_type: string;
    recurrence_days: string[];
    recurrence_end_date: string;
-   notify_email: boolean;
 }
 
 export default function NewReminderPage() {
@@ -51,7 +50,6 @@ export default function NewReminderPage() {
          recurrence_end_at: data.is_recurring && data.recurrence_end_date
             ? new Date(`${data.recurrence_end_date}T23:59:59`).toISOString()
             : null,
-         notify_email: data.notify_email,
       });
 
       if (res.error) {

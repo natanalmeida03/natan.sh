@@ -14,7 +14,6 @@ interface ReminderInput {
     due_at: string; // ISO string
     recurrence_rule?: string | null;
     recurrence_end_at?: string | null;
-    notify_email?: boolean;
 }
 
 // ─── Helpers de recorrência ──────────────────────────────────────────────
@@ -62,6 +61,26 @@ function getNextOccurrence(currentDue: Date, rule: string): Date | null {
     if (rule.includes("FREQ=WEEKLY")) {
         next.setDate(next.getDate() + 7);
         return next;
+    }
+
+    return null;
+}
+
+function getNextOccurrenceAfter(
+    currentDue: Date,
+    rule: string,
+    after: Date,
+    endAt?: string | null
+): Date | null {
+    let next = new Date(currentDue);
+    const end = endAt ? new Date(endAt) : null;
+
+    for (let i = 0; i < 2000; i++) {
+        const candidate = getNextOccurrence(next, rule);
+        if (!candidate) return null;
+        if (end && candidate > end) return null;
+        if (candidate > after) return candidate;
+        next = candidate;
     }
 
     return null;
@@ -200,6 +219,41 @@ export async function getReminderById(reminderId: string) {
     return { data };
 }
 
+export async function getReminderCompletionLogs(
+    reminderId: string,
+    options?: { limit?: number }
+) {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return { error: "User not authenticated" };
+    }
+
+    let query = supabase
+        .from("reminder_completion_logs")
+        .select("id, occurred_on, completed_at")
+        .eq("user_id", user.id)
+        .eq("reminder_id", reminderId)
+        .order("completed_at", { ascending: false });
+
+    if (options?.limit) {
+        query = query.limit(options.limit);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    return { data };
+}
+
 export async function getUpcomingReminders(limit: number = 10) {
     const supabase = await createClient();
 
@@ -258,7 +312,6 @@ export async function createReminder(input: ReminderInput) {
             due_at: input.due_at,
             recurrence_rule: input.recurrence_rule || null,
             recurrence_end_at: input.recurrence_end_at || null,
-            notify_email: input.notify_email ?? false,
         })
         .select("*, categories(id, name, color, icon)")
         .single();
@@ -321,13 +374,6 @@ export async function updateReminder(
         updates.recurrence_rule = input.recurrence_rule;
     if (input.recurrence_end_at !== undefined)
         updates.recurrence_end_at = input.recurrence_end_at;
-    if (input.notify_email !== undefined)
-        updates.notify_email = input.notify_email;
-
-    // Reset notified_at when due_at or notify_email changes so the user gets notified again
-    if (input.due_at !== undefined || input.notify_email !== undefined) {
-        updates.notified_at = null;
-    }
 
     if (Object.keys(updates).length === 0) {
         return { error: "Nothing to update" };
@@ -411,22 +457,42 @@ export async function toggleReminderComplete(reminderId: string) {
     // Se está marcando como completo E tem recorrência, avança para próxima data
     if (newStatus && current.recurrence_rule) {
         const currentDue = new Date(current.due_at);
-        const nextDue = getNextOccurrence(currentDue, current.recurrence_rule);
+        const now = new Date();
+        const completedAt = now.toISOString();
+        const occurredOn = completedAt.split("T")[0];
+
+        const { error: logError } = await supabase
+            .from("reminder_completion_logs")
+            .upsert(
+                {
+                    reminder_id: reminderId,
+                    user_id: user.id,
+                    occurred_on: occurredOn,
+                    completed_at: completedAt,
+                },
+                { onConflict: "reminder_id,occurred_on" }
+            );
+
+        if (logError) {
+            return { error: logError.message };
+        }
+
+        const nextDue = getNextOccurrenceAfter(
+            currentDue,
+            current.recurrence_rule,
+            now,
+            current.recurrence_end_at
+        );
 
         // Verifica se próxima ocorrência está dentro do limite
-        const pastEnd = nextDue && current.recurrence_end_at
-            ? nextDue > new Date(current.recurrence_end_at)
-            : false;
-
-        if (nextDue && !pastEnd) {
+        if (nextDue) {
             // Avança due_at para próxima ocorrência, mantém pendente
             const { data, error } = await supabase
                 .from("reminders")
                 .update({
                     due_at: nextDue.toISOString(),
                     is_completed: false,
-                    completed_at: null,
-                    notified_at: null,
+                    completed_at: completedAt,
                 })
                 .eq("id", reminderId)
                 .eq("user_id", user.id)
@@ -560,7 +626,39 @@ export async function getRemindersByDate(date: string) {
         );
     });
 
-    return { data: [...(directReminders || []), ...expandedRecurring] };
+    const { data: completionLogs, error: completionError } = await supabase
+        .from("reminder_completion_logs")
+        .select(
+            "id, reminder_id, occurred_on, completed_at, reminders!inner(id, title, due_at, categories(id, name, color, icon))"
+        )
+        .eq("user_id", user.id)
+        .eq("occurred_on", date);
+
+    if (completionError) {
+        return { error: completionError.message };
+    }
+
+    const completedEntries = (completionLogs || []).map((log) => {
+        const reminder = log.reminders as {
+            id: string;
+            title: string;
+            due_at: string;
+            categories?: { id: string; name: string; color?: string | null; icon?: string | null } | null;
+        };
+
+        return {
+            id: `${reminder.id}-completed-${log.id}`,
+            title: reminder.title,
+            due_at: log.completed_at || reminder.due_at,
+            is_completed: true,
+            categories: reminder.categories,
+        };
+    });
+
+    const merged = [...(directReminders || []), ...expandedRecurring, ...completedEntries];
+    merged.sort((a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime());
+
+    return { data: merged };
 }
 
 // Busca todas as datas do mês que possuem pelo menos um lembrete (inclui recorrências)
@@ -619,6 +717,26 @@ export async function getRemindersForMonth(year: number, month: number) {
             r.recurrence_end_at
         );
         expanded.forEach((d) => uniqueDates.add(d));
+    });
+
+    const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
+    const monthEnd = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+    const { data: completionData, error: completionError } = await supabase
+        .from("reminder_completion_logs")
+        .select("occurred_on")
+        .eq("user_id", user.id)
+        .gte("occurred_on", monthStart)
+        .lte("occurred_on", monthEnd);
+
+    if (completionError) {
+        return { error: completionError.message };
+    }
+
+    (completionData || []).forEach((r) => {
+        if (r.occurred_on) {
+            uniqueDates.add(r.occurred_on as string);
+        }
     });
 
     return { data: [...uniqueDates] };

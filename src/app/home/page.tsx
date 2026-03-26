@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Flame, Bell, Target, RotateCw } from "lucide-react";
+import { Flame, Bell } from "lucide-react";
 import DailyNote from "@/components/DailyNote";
 import QuickHabits from "@/components/QuickHabits";
 import UpcomingReminders from "@/components/UpcomingReminders";
@@ -37,22 +37,6 @@ interface Reminder {
   categories?: { name: string; color?: string | null } | null;
 }
 
-interface Routine {
-  id: string;
-  title: string;
-  scheduled_time?: string | null;
-  routine_steps?: { id: string }[];
-}
-
-interface GoalData {
-  goal_id: string;
-  title: string;
-  goal_type: string;
-  target_value: number;
-  current_value: number;
-  progress_pct: number;
-}
-
 function getGreeting(): string {
   const hour = new Date().getHours();
   if (hour < 12) return "Bom dia";
@@ -69,13 +53,10 @@ export default function HomePage() {
   const [streaks, setStreaks] = useState<Record<string, Streak>>({});
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [overdueCount, setOverdueCount] = useState(0);
-  const [routines, setRoutines] = useState<Routine[]>([]);
-  const [goals, setGoals] = useState<GoalData[]>([]);
   const [stats, setStats] = useState({
     pending_reminders: 0,
     active_habits: 0,
     habits_completed_today: 0,
-    today_routines: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -107,7 +88,6 @@ export default function HomePage() {
         pending_reminders: dashRes.data.pending_reminders,
         active_habits: dashRes.data.active_habits,
         habits_completed_today: dashRes.data.habits_completed_today,
-        today_routines: dashRes.data.today_routines,
       });
 
       // Streaks
@@ -116,9 +96,6 @@ export default function HomePage() {
         streakMap[s.habit_id] = s;
       });
       setStreaks(streakMap);
-
-      // Goals
-      setGoals(dashRes.data.goals as GoalData[]);
     }
 
     // Habits

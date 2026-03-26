@@ -33,7 +33,7 @@ const ICONS: { emoji: string; tags: string[] }[] = [
    { emoji: "📚", tags: ["read", "book", "study", "ler", "livro"] },
    { emoji: "✍️", tags: ["write", "journal", "diary", "escrever"] },
    { emoji: "🧠", tags: ["brain", "think", "learn", "aprender"] },
-   { emoji: "🎯", tags: ["goal", "target", "focus", "foco", "meta"] },
+   { emoji: "🎯", tags: ["target", "focus", "foco", "meta"] },
    { emoji: "📝", tags: ["note", "todo", "task", "tarefa"] },
    { emoji: "🗣️", tags: ["speak", "language", "talk", "falar", "idioma"] },
    // Creative
@@ -74,7 +74,7 @@ const ICONS: { emoji: string; tags: string[] }[] = [
    { emoji: "👔", tags: ["dress", "outfit", "clothes", "roupa"] },
    { emoji: "🧳", tags: ["travel", "trip", "pack", "viagem"] },
    { emoji: "♻️", tags: ["recycle", "eco", "green", "reciclar"] },
-   { emoji: "🌅", tags: ["morning", "routine", "sunrise", "manha"] },
+   { emoji: "🌅", tags: ["morning", "sunrise", "manha"] },
    { emoji: "🌙", tags: ["night", "evening", "bedtime", "noite"] },
 ];
 
