@@ -638,21 +638,31 @@ export async function getRemindersByDate(date: string) {
         return { error: completionError.message };
     }
 
-    const completedEntries = (completionLogs || []).map((log) => {
-        const reminder = log.reminders as {
+    const completedEntries = (completionLogs || []).flatMap((log) => {
+        const reminders = log.reminders as Array<{
             id: string;
             title: string;
             due_at: string;
-            categories?: { id: string; name: string; color?: string | null; icon?: string | null } | null;
-        };
+            categories?: Array<{
+                id: string;
+                name: string;
+                color?: string | null;
+                icon?: string | null;
+            }> | null;
+        }> | null;
+        const reminder = reminders?.[0];
 
-        return {
+        if (!reminder) {
+            return [];
+        }
+
+        return [{
             id: `${reminder.id}-completed-${log.id}`,
             title: reminder.title,
             due_at: log.completed_at || reminder.due_at,
             is_completed: true,
-            categories: reminder.categories,
-        };
+            categories: reminder.categories?.[0] || null,
+        }];
     });
 
     const merged = [...(directReminders || []), ...expandedRecurring, ...completedEntries];
