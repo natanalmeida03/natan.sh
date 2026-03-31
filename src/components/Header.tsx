@@ -45,6 +45,7 @@ function Header () {
                <Link href={'/home'}> home </Link>
                <Link href={'/habits'}> habits </Link>
                <Link href={'/reminders'}> reminders </Link>
+               <Link href={'/notes'}> notes </Link>
                <Link href={'/profile'}> profile </Link>
                <p className="cursor-pointer" onClick={LogoutSubmit}>
                   <LogOut className="text-accent" size={20}/>
@@ -83,6 +84,13 @@ function Header () {
                   className="block px-3 py-3 hover:bg-foreground hover:text-background transition-colors"
                >
                   <span className="text-muted">{">"}</span> reminders
+               </Link>
+               <Link
+                  href="/notes"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-3 py-3 hover:bg-foreground hover:text-background transition-colors"
+               >
+                  <span className="text-muted">{">"}</span> notes
                </Link>
                <Link
                   href="/profile"

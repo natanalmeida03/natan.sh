@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { LogOut, ArrowLeft } from 'lucide-react'
 import { logout } from "@/lib/auth";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface HeaderProps {
@@ -11,21 +11,11 @@ interface HeaderProps {
 
 function Header ( { backRoute = () => {} }: HeaderProps) {
    const router = useRouter();
-   const pathname = usePathname();
-   const [inputValue, setInputValue] = useState("");
    const [menuOpen, setMenuOpen] = useState(false);
-   const currentPage = pathname.split("/")[1] || "home";
 
    async function LogoutSubmit () {
       await logout();
       router.push("/");
-   }
-
-   function handleInputKeyDown (e: React.KeyboardEvent<HTMLInputElement>) {
-      if (e.key === "Enter" && inputValue.toLowerCase() === "neofetch") {
-         router.push("/about");
-         setInputValue("");
-      }
    }
 
    return (
@@ -41,6 +31,7 @@ function Header ( { backRoute = () => {} }: HeaderProps) {
                <Link href={'/home'}> home </Link>
                <Link href={'/habits'}> habits </Link>
                <Link href={'/reminders'}> reminders </Link>
+               <Link href={'/notes'}> notes </Link>
                <Link href={'/profile'}> profile </Link>
                <p className="cursor-pointer" onClick={LogoutSubmit}>
                   <LogOut className="text-accent" size={20}/>
@@ -79,6 +70,13 @@ function Header ( { backRoute = () => {} }: HeaderProps) {
                   className="block px-3 py-3 hover:bg-foreground hover:text-background transition-colors"
                >
                   <span className="text-muted">{">"}</span> reminders
+               </Link>
+               <Link
+                  href="/notes"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-3 py-3 hover:bg-foreground hover:text-background transition-colors"
+               >
+                  <span className="text-muted">{">"}</span> notes
                </Link>
                <Link
                   href="/profile"

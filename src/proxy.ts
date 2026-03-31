@@ -36,7 +36,7 @@ export async function proxy(request: NextRequest) {
    const { data: { user } } = await supabase.auth.getUser();
 
    // Rotas protegidas
-   const protectedRoutes = ["/home", "/profile", "/reminders", "/habits"];
+   const protectedRoutes = ["/home", "/profile", "/reminders", "/habits", "/notes"];
    const isProtectedRoute = protectedRoutes.some(route => 
       request.nextUrl.pathname.startsWith(route)
    );
@@ -65,6 +65,7 @@ export const config = {
       "/home/:path*",
       "/reminders/:path*",
       "/habits/:path*",
+      "/notes/:path*",
       "/profile",
       "/login",
       "/register",
