@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import { Check, Trash2, Clock, Repeat, AlertTriangle } from "lucide-react";
+import { Trash2, Clock, Repeat } from "lucide-react";
 
 interface ReminderCardProps {
    reminder: {
@@ -13,7 +12,6 @@ interface ReminderCardProps {
       recurrence_rule?: string | null;
       categories?: { name: string; color?: string | null } | null;
    };
-   onToggle: (id: string) => Promise<void>;
    onEdit: (id: string) => void;
    onDelete: (id: string) => Promise<void>;
 }
@@ -32,15 +30,15 @@ function formatDueDate(iso: string): string {
    if (target.getTime() === tomorrow.getTime()) return `Tomorrow, ${time}`;
 
    const diff = Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-   if (diff < 0) return `${Math.abs(diff)}d before, ${time}`;
+   if (diff < 0) {
+      return (
+         date.toLocaleDateString("en-us", { day: "2-digit", month: "short" }) +
+         `, ${time}`
+      );
+   }
    if (diff <= 7) return `${date.toLocaleDateString("en-us", { weekday: "short" })}, ${time}`;
 
    return date.toLocaleDateString("en-us", { day: "2-digit", month: "short" }) + `, ${time}`;
-}
-
-function isOverdue(iso: string, completed: boolean): boolean {
-   if (completed) return false;
-   return new Date(iso) < new Date();
 }
 
 const DAY_LABELS: Record<string, string> = {
@@ -61,18 +59,8 @@ function parseRecurrence(rule?: string | null): string | null {
    return "Recurring";
 }
 
-export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: ReminderCardProps) {
-   const [loading, setLoading] = useState(false);
-
-   const overdue = isOverdue(reminder.due_at, reminder.is_completed);
+export default function ReminderCard({ reminder, onEdit, onDelete }: ReminderCardProps) {
    const recurrenceLabel = parseRecurrence(reminder.recurrence_rule);
-
-   async function handleToggle(e: React.MouseEvent) {
-      e.stopPropagation();
-      setLoading(true);
-      await onToggle(reminder.id);
-      setLoading(false);
-   }
 
    return (
       <div
@@ -80,28 +68,10 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
          className={`relative border rounded-lg p-3 sm:p-4 transition-all cursor-pointer ${
             reminder.is_completed
                ? "border-foreground/10 bg-foreground/2"
-               : overdue
-               ? "border-red-300 bg-red-50/40"
                : "border-foreground/20 bg-background"
          }`}
       >
          <div className="flex items-start gap-3">
-            {/* Check button */}
-            <button
-               onClick={handleToggle}
-               disabled={loading}
-               className={`shrink-0 mt-0.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed ${
-                  reminder.is_completed
-                     ? "bg-foreground/20 text-foreground/40"
-                     : overdue
-                     ? "border-2 border-red-400 text-transparent hover:bg-red-500 hover:text-white"
-                     : "border-2 border-foreground/30 text-transparent hover:border-green-400 hover:text-green-400"
-               }`}
-            >
-               <Check size={16} strokeWidth={3} />
-            </button>
-
-            {/* Content */}
             <div className="flex-1 min-w-0">
                <h3
                   className={`text-sm sm:text-base font-semibold truncate ${
@@ -129,12 +99,10 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                      className={`text-[10px] sm:text-xs font-mono flex items-center gap-1 ${
                         reminder.is_completed
                            ? "text-foreground/30"
-                           : overdue
-                           ? "text-red-500"
                            : "text-foreground/60"
                      }`}
                   >
-                     {overdue ? <AlertTriangle size={11} /> : <Clock size={11} />}
+                     <Clock size={11} />
                      {formatDueDate(reminder.due_at)}
                   </span>
 
@@ -163,7 +131,6 @@ export default function ReminderCard({ reminder, onToggle, onEdit, onDelete }: R
                </div>
             </div>
 
-            {/* Delete button */}
             <button
                onClick={async (e) => {
                   e.stopPropagation();

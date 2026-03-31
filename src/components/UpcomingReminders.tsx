@@ -1,5 +1,5 @@
 "use client";
-import { Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { Clock, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Reminder {
@@ -12,7 +12,6 @@ interface Reminder {
 
 interface UpcomingRemindersProps {
    reminders: Reminder[];
-   overdueCount: number;
 }
 
 function formatRelative(iso: string): string {
@@ -29,7 +28,7 @@ function formatRelative(iso: string): string {
    return date.toLocaleDateString("en-us", { day: "2-digit", month: "short" }) + `, ${time}`;
 }
 
-export default function UpcomingReminders({ reminders, overdueCount }: UpcomingRemindersProps) {
+export default function UpcomingReminders({ reminders }: UpcomingRemindersProps) {
    const router = useRouter();
 
    return (
@@ -46,20 +45,7 @@ export default function UpcomingReminders({ reminders, overdueCount }: UpcomingR
             </button>
          </div>
 
-         {/* Overdue alert */}
-         {overdueCount > 0 && (
-            <button
-               onClick={() => router.push("/reminders")}
-               className="w-full flex items-center gap-2 px-2.5 py-2 mb-2 bg-red-50 border border-red-200 rounded-md cursor-pointer hover:bg-red-100 transition-colors"
-            >
-               <AlertTriangle size={14} className="text-red-500 shrink-0" />
-               <span className="text-xs text-red-600 font-medium">
-                  {overdueCount} overdue reminder{overdueCount > 1 ? "s" : ""}
-               </span>
-            </button>
-         )}
-
-         {reminders.length === 0 && overdueCount === 0 ? (
+         {reminders.length === 0 ? (
             <p className="text-xs text-foreground/30 text-center py-3">
                No upcoming reminders
             </p>

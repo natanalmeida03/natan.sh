@@ -8,8 +8,8 @@ import UpcomingReminders from "@/components/UpcomingReminders";
 import HomeCalendar from "@/components/HomeCalendar";
 import { getDashboardStats } from "@/lib/stats";
 import { getHabits, logHabit, unlogHabit, isHabitLoggedToday, getHabitLogsByDate, getHabitLogsForMonth } from "@/lib/habits";
-import { getUpcomingReminders, getReminders, getRemindersByDate, getRemindersForMonth } from "@/lib/reminders";
-import { getProfile } from "@/lib/profile";
+import { getReminders, getRemindersByDate, getRemindersForMonth } from "@/lib/reminders";
+import { getActiveRemindersForDisplay } from "@/lib/reminder-schedule";
 import { getDailyNoteByDate, getNotesForMonth } from "@/lib/daily-notes";
 import Header from "@/components/Header";
 
@@ -34,25 +34,18 @@ interface Reminder {
   title: string;
   due_at: string;
   is_completed: boolean;
+  recurrence_rule?: string | null;
+  recurrence_end_at?: string | null;
   categories?: { name: string; color?: string | null } | null;
-}
-
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Bom dia";
-  if (hour < 18) return "Boa tarde";
-  return "Boa noite";
 }
 
 export default function HomePage() {
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loggedToday, setLoggedToday] = useState<Record<string, boolean>>({});
   const [streaks, setStreaks] = useState<Record<string, Streak>>({});
   const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [overdueCount, setOverdueCount] = useState(0);
   const [stats, setStats] = useState({
     pending_reminders: 0,
     active_habits: 0,
@@ -61,26 +54,15 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
-    setLoading(true);
-
     const [
-      profileRes,
       dashRes,
       habitsRes,
       remindersRes,
-      overdueRes,
     ] = await Promise.all([
-      getProfile(),
       getDashboardStats(),
       getHabits({ active_only: true }),
-      getUpcomingReminders(5),
       getReminders({ completed: false }),
     ]);
-
-    // Profile
-    if (profileRes.data) {
-      setUsername(profileRes.data.username || "");
-    }
 
     // Dashboard stats
     if (dashRes.data) {
@@ -116,21 +98,26 @@ export default function HomePage() {
 
     // Reminders
     if (remindersRes.data) {
-      setReminders(remindersRes.data as Reminder[]);
-    }
-    if (overdueRes.data) {
-      const now = new Date();
-      const overdue = (overdueRes.data as Reminder[]).filter(
-        (r) => new Date(r.due_at) < now
+      const activeReminders = getActiveRemindersForDisplay(
+        remindersRes.data as Reminder[]
       );
-      setOverdueCount(overdue.length);
+
+      setReminders(activeReminders.slice(0, 5));
+      setStats((prev) => ({
+        ...prev,
+        pending_reminders: activeReminders.length,
+      }));
     }
 
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    loadData();
+    const timeoutId = window.setTimeout(() => {
+      void loadData();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [loadData]);
 
   async function handleLog(habitId: string) {
@@ -306,7 +293,6 @@ export default function HomePage() {
           <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-5 order-3">
             <UpcomingReminders
               reminders={reminders}
-              overdueCount={overdueCount}
             />
             <QuickHabits
               habits={habits}

@@ -5,6 +5,7 @@ import {
     updateCalendarEvent,
     deleteCalendarEvent,
 } from "@/lib/calendar";
+import { getActiveRemindersForDisplay } from "@/lib/reminder-schedule";
 import { supabaseAdmin } from "@/utils/supabase/admin";
 
 interface ReminderInput {
@@ -84,6 +85,23 @@ function getNextOccurrenceAfter(
     }
 
     return null;
+}
+
+function shiftDateKey(date: string, days: number): string {
+    const [year, month, day] = date.split("-").map(Number);
+    const shifted = new Date(Date.UTC(year, month - 1, day));
+    shifted.setUTCDate(shifted.getUTCDate() + days);
+    return shifted.toISOString().split("T")[0];
+}
+
+function getReminderDateKey(dueAt: string): string | null {
+    const parsed = new Date(dueAt);
+
+    if (Number.isNaN(parsed.getTime())) {
+        return null;
+    }
+
+    return parsed.toISOString().split("T")[0];
 }
 
 /** Check if a recurring reminder should appear on a specific date */
@@ -271,15 +289,13 @@ export async function getUpcomingReminders(limit: number = 10) {
         .select("*, categories(id, name, color, icon)")
         .eq("user_id", user.id)
         .eq("is_completed", false)
-        .gte("due_at", new Date().toISOString())
-        .order("due_at", { ascending: true })
-        .limit(limit);
+        .order("due_at", { ascending: true });
 
     if (error) {
         return { error: error.message };
     }
 
-    return { data };
+    return { data: getActiveRemindersForDisplay(data || []).slice(0, limit) };
 }
 
 export async function createReminder(input: ReminderInput) {
@@ -428,7 +444,10 @@ export async function updateReminder(
     return { success: true, data };
 }
 
-export async function toggleReminderComplete(reminderId: string) {
+export async function toggleReminderComplete(
+    reminderId: string,
+    occurrenceDueAt?: string
+) {
     const supabase = await createClient();
 
     const {
@@ -459,7 +478,12 @@ export async function toggleReminderComplete(reminderId: string) {
         const currentDue = new Date(current.due_at);
         const now = new Date();
         const completedAt = now.toISOString();
-        const occurredOn = completedAt.split("T")[0];
+        const completionReference = occurrenceDueAt
+            ? new Date(occurrenceDueAt)
+            : currentDue > now
+            ? currentDue
+            : now;
+        const occurredOn = completionReference.toISOString().split("T")[0];
 
         const { error: logError } = await supabase
             .from("reminder_completion_logs")
@@ -480,7 +504,7 @@ export async function toggleReminderComplete(reminderId: string) {
         const nextDue = getNextOccurrenceAfter(
             currentDue,
             current.recurrence_rule,
-            now,
+            completionReference,
             current.recurrence_end_at
         );
 
@@ -585,20 +609,24 @@ export async function getRemindersByDate(date: string) {
     }
 
     // Busca lembretes com due_at nesse dia (ocorrência direta)
-    const from = `${date}T00:00:00.000Z`;
-    const to = `${date}T23:59:59.999Z`;
+    const paddedFrom = `${shiftDateKey(date, -1)}T00:00:00.000Z`;
+    const paddedTo = `${shiftDateKey(date, 1)}T23:59:59.999Z`;
 
-    const { data: directReminders, error: directError } = await supabase
+    const { data: directCandidates, error: directError } = await supabase
         .from("reminders")
         .select("*, categories(id, name, color, icon)")
         .eq("user_id", user.id)
-        .gte("due_at", from)
-        .lte("due_at", to)
+        .gte("due_at", paddedFrom)
+        .lte("due_at", paddedTo)
         .order("due_at", { ascending: true });
 
     if (directError) {
         return { error: directError.message };
     }
+
+    const directReminders = (directCandidates || []).filter(
+        (reminder) => getReminderDateKey(reminder.due_at) === date
+    );
 
     // Busca todos os lembretes recorrentes do usuário (due_at <= date, não completados)
     const { data: recurringReminders, error: recurringError } = await supabase
@@ -607,7 +635,7 @@ export async function getRemindersByDate(date: string) {
         .eq("user_id", user.id)
         .eq("is_completed", false)
         .not("recurrence_rule", "is", null)
-        .lte("due_at", to);
+        .lte("due_at", paddedTo);
 
     if (recurringError) {
         return { error: recurringError.message };
@@ -684,24 +712,31 @@ export async function getRemindersForMonth(year: number, month: number) {
         return { error: "User not authenticated" };
     }
 
-    const from = `${year}-${String(month).padStart(2, "0")}-01T00:00:00.000Z`;
+    const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
     const lastDay = new Date(year, month, 0).getDate();
-    const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}T23:59:59.999Z`;
+    const monthEnd = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    const paddedFrom = `${shiftDateKey(monthStart, -1)}T00:00:00.000Z`;
+    const paddedTo = `${shiftDateKey(monthEnd, 1)}T23:59:59.999Z`;
 
     // Lembretes diretos no mês
     const { data: directData, error: directError } = await supabase
         .from("reminders")
         .select("due_at")
         .eq("user_id", user.id)
-        .gte("due_at", from)
-        .lte("due_at", to);
+        .gte("due_at", paddedFrom)
+        .lte("due_at", paddedTo);
 
     if (directError) {
         return { error: directError.message };
     }
 
     const uniqueDates = new Set(
-        (directData || []).map((r) => (r.due_at as string).split("T")[0])
+        (directData || [])
+            .map((r) => getReminderDateKey(r.due_at as string))
+            .filter(
+                (dateKey): dateKey is string =>
+                    !!dateKey && dateKey >= monthStart && dateKey <= monthEnd
+            )
     );
 
     // Lembretes recorrentes que começaram antes ou durante o mês
@@ -711,7 +746,7 @@ export async function getRemindersForMonth(year: number, month: number) {
         .eq("user_id", user.id)
         .eq("is_completed", false)
         .not("recurrence_rule", "is", null)
-        .lte("due_at", to);
+        .lte("due_at", paddedTo);
 
     if (recurringError) {
         return { error: recurringError.message };
@@ -728,9 +763,6 @@ export async function getRemindersForMonth(year: number, month: number) {
         );
         expanded.forEach((d) => uniqueDates.add(d));
     });
-
-    const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
-    const monthEnd = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
 
     const { data: completionData, error: completionError } = await supabase
         .from("reminder_completion_logs")

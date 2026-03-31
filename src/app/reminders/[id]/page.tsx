@@ -2,12 +2,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
-   ChevronLeft,
-   Pencil,
    Clock,
    Repeat,
    AlertTriangle,
-   CheckCircle2,
    Tag,
 } from "lucide-react";
 import ReminderForm from "@/components/ReminderForm";
@@ -16,9 +13,11 @@ import {
    getReminderById,
    updateReminder,
    deleteReminder,
-   toggleReminderComplete,
-   getReminderCompletionLogs,
 } from "@/lib/reminders";
+import {
+   isReminderPassed,
+   normalizeReminderForDisplay,
+} from "@/lib/reminder-schedule";
 import { getCategories, createCategorySimple } from "@/lib/categories";
 import Header from "@/components/HeaderSecondary";
 
@@ -54,12 +53,6 @@ interface ReminderFormData {
    recurrence_end_date: string;
 }
 
-interface ReminderCompletionLog {
-   id: string;
-   occurred_on: string;
-   completed_at: string;
-}
-
 const DAY_LABELS: Record<string, string> = {
    MO: "Mon", TU: "Tue", WE: "Wed", TH: "Thu", FR: "Fri", SA: "Sat", SU: "Sun",
 };
@@ -85,40 +78,37 @@ export default function ReminderDetailPage() {
 
    const [reminder, setReminder] = useState<Reminder | null>(null);
    const [categories, setCategories] = useState<Category[]>([]);
-   const [completionLogs, setCompletionLogs] = useState<ReminderCompletionLog[]>([]);
    const [loading, setLoading] = useState(true);
    const [editing, setEditing] = useState(false);
+   const displayReminder = reminder
+      ? normalizeReminderForDisplay(reminder) || reminder
+      : null;
+   const passed = reminder ? isReminderPassed(reminder) : false;
 
    const loadData = useCallback(async () => {
-      setLoading(true);
-
-      const [reminderRes, categoriesRes, logsRes] = await Promise.all([
+      const [reminderRes, categoriesRes] = await Promise.all([
          getReminderById(reminderId),
          getCategories(),
-         getReminderCompletionLogs(reminderId, { limit: 60 }),
       ]);
 
       if (reminderRes.data) setReminder(reminderRes.data as Reminder);
       if (categoriesRes.data) setCategories(categoriesRes.data as Category[]);
-      if (logsRes.data) setCompletionLogs(logsRes.data as ReminderCompletionLog[]);
 
       setLoading(false);
    }, [reminderId]);
 
    useEffect(() => {
-      loadData();
-   }, [loadData]);
+      const timeoutId = window.setTimeout(() => {
+         void loadData();
+      }, 0);
 
-   async function handleToggle() {
-      const res = await toggleReminderComplete(reminderId);
-      if (!res.error) {
-         await loadData();
-      }
-   }
+      return () => window.clearTimeout(timeoutId);
+   }, [loadData]);
 
    async function handleUpdate(data: ReminderFormData) {
       const dueAt = new Date(`${data.due_date}T${data.due_time}`).toISOString();
 
+      setLoading(true);
       const res = await updateReminder(reminderId, {
          title: data.title,
          description: data.description || null,
@@ -131,6 +121,7 @@ export default function ReminderDetailPage() {
       });
 
       if (res.error) {
+         setLoading(false);
          return { error: res.error };
       }
 
@@ -168,8 +159,8 @@ export default function ReminderDetailPage() {
       );
    }
 
-   const dueDate = new Date(reminder.due_at);
-   const overdue = !reminder.is_completed && dueDate < new Date();
+   const effectiveReminder = displayReminder || reminder;
+   const dueDate = new Date(effectiveReminder.due_at);
    const recurrenceLabel = parseRecurrence(reminder.recurrence_rule);
 
    // Build initial form data from existing reminder
@@ -219,28 +210,10 @@ export default function ReminderDetailPage() {
                   <Header backRoute={() => router.back()} />
                   <div className="flex flex-col gap-4 sm:gap-5">
                      {/* Status banner */}
-                     {reminder.is_completed ? (
-                        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                           <CheckCircle2 size={18} className="text-green-500 shrink-0" />
-                           <div>
-                              <p className="text-xs sm:text-sm font-medium text-green-700">Completed</p>
-                              {reminder.completed_at && (
-                                 <p className="text-[10px] sm:text-xs text-green-600/70 font-mono">
-                                    {new Date(reminder.completed_at).toLocaleDateString("en-us", {
-                                       day: "2-digit",
-                                       month: "long",
-                                       year: "numeric",
-                                       hour: "2-digit",
-                                       minute: "2-digit",
-                                    })}
-                                 </p>
-                              )}
-                           </div>
-                        </div>
-                     ) : overdue ? (
-                        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                           <AlertTriangle size={18} className="text-red-500 shrink-0" />
-                           <p className="text-xs sm:text-sm font-medium text-red-700">Overdue</p>
+                     {passed ? (
+                        <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                           <AlertTriangle size={18} className="text-amber-500 shrink-0" />
+                           <p className="text-xs sm:text-sm font-medium text-amber-700">Passed</p>
                         </div>
                      ) : null}
 
@@ -258,7 +231,7 @@ export default function ReminderDetailPage() {
                            <Clock size={15} className="text-foreground/40 shrink-0" />
                            <span
                               className={`text-xs sm:text-sm font-mono ${
-                                 overdue ? "text-red-500" : "text-foreground/70"
+                                 passed ? "text-amber-700" : "text-foreground/70"
                               }`}
                            >
                               {dueDate.toLocaleDateString("en-us", {
@@ -316,52 +289,6 @@ export default function ReminderDetailPage() {
 
                      </div>
 
-                     {/* Toggle complete button */}
-                     <button
-                        onClick={handleToggle}
-                        className={`w-full px-4 py-2.5 rounded-lg font-medium text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center gap-2 ${
-                           reminder.is_completed
-                              ? "border-2 border-foreground text-foreground hover:bg-foreground hover:text-background"
-                              : "bg-green-500 text-white hover:bg-green-600"
-                        }`}
-                     >
-                        <CheckCircle2 size={16} />
-                        {reminder.is_completed ? "Mark as pending" : "Mark as completed"}
-                     </button>
-
-                     <div className="border border-foreground/15 rounded-lg p-4">
-                        <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-3">
-                           Completion log
-                        </h3>
-                        {completionLogs.length === 0 ? (
-                           <p className="text-xs text-foreground/45 font-mono">No completions yet</p>
-                        ) : (
-                           <div className="flex flex-col gap-2">
-                              {completionLogs.map((log) => (
-                                 <div
-                                    key={log.id}
-                                    className="flex items-center justify-between border border-foreground/10 rounded-md px-3 py-2"
-                                 >
-                                    <span className="text-xs text-foreground/70 font-mono">
-                                       {new Date(`${log.occurred_on}T12:00:00`).toLocaleDateString("en-us", {
-                                          weekday: "short",
-                                          day: "2-digit",
-                                          month: "short",
-                                          year: "numeric",
-                                       })}
-                                    </span>
-                                    <span className="text-[10px] sm:text-xs text-foreground/45 font-mono">
-                                       {new Date(log.completed_at).toLocaleTimeString("en-us", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                       })}
-                                    </span>
-                                 </div>
-                              ))}
-                           </div>
-                        )}
-                     </div>
-
                      {/* Danger zone */}
                      <div className="flex items-center gap-4 pt-4 border-t border-foreground/10">
                         <button
@@ -373,7 +300,7 @@ export default function ReminderDetailPage() {
 
                         <DeleteConfirm
                            title="Delete"
-                           message={`Are you sure you want to delete "${reminder.title}"? All check-in history will be lost.`}
+                           message={`Are you sure you want to delete "${reminder.title}"? This reminder will be permanently removed.`}
                            onConfirm={handleDelete}
                         />
                      </div>

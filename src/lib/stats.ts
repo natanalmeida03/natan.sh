@@ -1,5 +1,6 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
+import { getActiveRemindersForDisplay } from "@/lib/reminder-schedule";
 
 // Streaks de todos os hábitos ativos
 export async function getHabitStreaks() {
@@ -94,10 +95,9 @@ export async function getDashboardStats() {
         // Lembretes pendentes para hoje
         supabase
             .from("reminders")
-            .select("id", { count: "exact", head: true })
+            .select("due_at, is_completed, recurrence_rule, recurrence_end_at")
             .eq("user_id", user.id)
-            .eq("is_completed", false)
-            .lte("due_at", new Date().toISOString()),
+            .eq("is_completed", false),
 
         // Total de hábitos ativos
         supabase
@@ -122,7 +122,9 @@ export async function getDashboardStats() {
 
     return {
         data: {
-            pending_reminders: remindersResult.count || 0,
+            pending_reminders: getActiveRemindersForDisplay(
+                remindersResult.data || []
+            ).length,
             active_habits: habitsResult.count || 0,
             habits_completed_today: todayLogsResult.data?.length || 0,
             streaks: streaksResult.data || [],
