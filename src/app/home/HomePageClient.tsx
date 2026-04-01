@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import HomeCalendar from "@/components/HomeCalendar";
 import QuickHabits from "@/components/QuickHabits";
 import UpcomingReminders from "@/components/UpcomingReminders";
+import WeeklyRecapSection from "@/components/WeeklyRecapSection";
 import { getDailyNoteByDate, getNotesForMonth } from "@/lib/daily-notes";
 import {
     getHabitLogsByDate,
@@ -210,6 +211,10 @@ export default function HomePageClient({ initialData }: HomePageClientProps) {
                             onUnlog={handleUnlog}
                         />
                     </div>
+                </div>
+
+                <div className="mt-5 sm:mt-6">
+                    <WeeklyRecapSection initialState={initialData.weeklyRecap} />
                 </div>
             </div>
         </div>

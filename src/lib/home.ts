@@ -1,6 +1,7 @@
 "use server";
 
 import { getActiveRemindersForDisplay } from "@/lib/reminder-schedule";
+import { getWeeklyRecapHomeStateForUser } from "@/lib/weekly-recaps";
 import type {
     HomeDailyNote,
     HomeHabit,
@@ -45,6 +46,11 @@ function getEmptyHomeInitialData(): HomeInitialData {
         },
         note: null,
         monthMarkers: {},
+        weeklyRecap: {
+            summaries: [],
+            current_week_end: "",
+            setup_required: false,
+        },
     };
 }
 
@@ -276,6 +282,7 @@ export async function getHomeInitialData(
         monthNotesResult,
         completionLogsResult,
         monthHabitLogsResult,
+        weeklyRecap,
     ] = await Promise.all([
         supabase
             .from("habits")
@@ -331,6 +338,8 @@ export async function getHomeInitialData(
             .eq("habits.user_id", user.id)
             .gte("logged_date", monthStart)
             .lte("logged_date", monthEnd),
+
+        getWeeklyRecapHomeStateForUser(user.id),
     ]);
 
     const habits = ((habitsResult.data || []) as HomeHabit[]).map((habit) => ({
@@ -388,5 +397,6 @@ export async function getHomeInitialData(
         },
         note,
         monthMarkers,
+        weeklyRecap,
     };
 }

@@ -1,3 +1,5 @@
+import type { WeeklyRecapHomeState } from "@/types/weekly-recaps";
+
 export type DailyMood = "great" | "good" | "neutral" | "bad" | "awful";
 
 export interface HomeHabit {
@@ -58,4 +60,5 @@ export interface HomeInitialData {
     stats: HomeStats;
     note: HomeDailyNote | null;
     monthMarkers: HomeMarkedDates;
+    weeklyRecap: WeeklyRecapHomeState;
 }
